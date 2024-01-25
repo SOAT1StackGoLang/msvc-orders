@@ -9,33 +9,32 @@ import (
 )
 
 type categoriesSvc struct {
-	log         *kitlog.Logger
+	log         kitlog.Logger
 	persistence persistence.CategoriesRepository
 }
 
-func (c *categoriesSvc) GetCategory(ctx context.Context, id uuid.UUID) (*models.Category, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *categoriesSvc) InsertCategory(ctx context.Context, userID uuid.UUID, in *models.Category) (*models.Category, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *categoriesSvc) DeleteCategory(ctx context.Context, userID, id uuid.UUID) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *categoriesSvc) ListCategories(ctx context.Context, userID uuid.UUID, limit, offset int) (*models.CategoryList, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func NewCategoriesService(persistence persistence.CategoriesRepository, log *kitlog.Logger) CategoriesService {
+func NewCategoriesService(persistence persistence.CategoriesRepository, log kitlog.Logger) CategoriesService {
 	return &categoriesSvc{
 		log:         log,
-		persistence: nil,
+		persistence: persistence,
 	}
+}
+
+func (c *categoriesSvc) GetCategory(ctx context.Context, id uuid.UUID) (*models.Category, error) {
+	return c.persistence.GetCategoryByID(ctx, id)
+}
+
+func (c *categoriesSvc) InsertCategory(ctx context.Context, in *models.Category) (*models.Category, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *categoriesSvc) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c *categoriesSvc) ListCategories(ctx context.Context, limit, offset int) (*models.CategoryList, error) {
+	//TODO implement me
+	panic("implement me")
 }
