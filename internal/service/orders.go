@@ -11,7 +11,7 @@ type ordersSvc struct {
 	log  any
 }
 
-func (o *ordersSvc) GetOrder(ctx context.Context, orderID uuid.UUID) (*models.Order, error) {
+func (o *ordersSvc) GetOrder(ctx context.Context, id uuid.UUID) (*models.Order, error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -26,12 +26,7 @@ func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product) 
 	panic("implement me")
 }
 
-func (o *ordersSvc) InsertProductsIntoOrder(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (o *ordersSvc) RemoveProductFromOrder(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error) {
+func (o *ordersSvc) UpdateOrderItems(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error) {
 	//TODO implement me
 	panic("implement me")
 }

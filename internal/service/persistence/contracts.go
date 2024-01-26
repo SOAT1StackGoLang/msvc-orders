@@ -34,7 +34,6 @@ type OrdersRepository interface {
 	CreateOrder(ctx context.Context, order *models.Order) (*models.Order, error)
 	UpdateOrder(ctx context.Context, order *models.Order) (*models.Order, error)
 	DeleteOrder(ctx context.Context, orderID uuid.UUID) error
-	SetOrderAsPaid(ctx context.Context, payment *models.Payment) error
 	ListOrdersByUser(ctx context.Context, limit, offset int, userID uuid.UUID) (*models.OrderList, error)
 	ListOrders(ctx context.Context, limit, offset int) (*models.OrderList, error)
 }

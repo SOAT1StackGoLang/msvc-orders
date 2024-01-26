@@ -28,8 +28,7 @@ type OrdersService interface {
 	GetOrder(ctx context.Context, orderID uuid.UUID) (*models.Order, error)
 	GetOrderByPaymentID(ctx context.Context, paymentID uuid.UUID) (*models.Order, error)
 	CreateOrder(ctx context.Context, products []models.Product) (*models.Order, error)
-	InsertProductsIntoOrder(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error)
-	RemoveProductFromOrder(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error)
+	UpdateOrderItems(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error)
 	DeleteOrder(ctx context.Context, orderID uuid.UUID) error
 	ListOrders(ctx context.Context, limit, offset int) (*models.OrderList, error)
 	Checkout(ctx context.Context, paymentID uuid.UUID) (*models.Order, error)
