@@ -2,7 +2,6 @@
 package main
 
 import (
-	"context"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
@@ -16,8 +15,6 @@ func main() {
 	_, err := initializeApp()
 	log.Println("Bootstrapping msvc-orders...")
 
-	ctx := context.Background()
-
 	gormDB, err := gorm.Open(postgres.Open(connString), &gorm.Config{
 		SkipDefaultTransaction: true,
 	})
@@ -25,8 +22,11 @@ func main() {
 		log.Panicf("failed initializing db: %s\n", err)
 	}
 
-	catRepo := persistence.NewCategoriesPersistence(ctx, gormDB, logger.InfoLogger)
+	catRepo := persistence.NewCategoriesPersistence(gormDB, logger.InfoLogger)
 	categoriesSvc := service.NewCategoriesService(catRepo, logger.InfoLogger)
+
+	productsRepo := persistence.NewProductsPersistence(gormDB, logger.InfoLogger)
+	_ = service.NewProductsService(productsRepo, logger.InfoLogger)
 
 	handler := transport.NewHTTPHandler(categoriesSvc, logger.InfoLogger)
 
