@@ -34,11 +34,11 @@ func makeGetCategoryEndpoint(svc service.CategoriesService) endpoint.Endpoint {
 			return nil, err
 		}
 
-		out := GetCategoryResponse{
-			ID:        cat.ID.String(),
-			CreatedAt: cat.CreatedAt.String(),
-			Name:      cat.Name,
-		}
+		var out GetCategoryResponse
+		out.ID = cat.ID.String()
+		out.CreatedAt = cat.CreatedAt.String()
+		out.Name = cat.Name
+
 		if !cat.UpdatedAt.IsZero() {
 			out.UpdatedAt = cat.UpdatedAt.String()
 		}
