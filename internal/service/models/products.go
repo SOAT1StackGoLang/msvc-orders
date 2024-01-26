@@ -11,7 +11,6 @@ type Product struct {
 	CategoryID  uuid.UUID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedAt   time.Time
 	Name        string
 	Description string
 	Price       decimal.Decimal

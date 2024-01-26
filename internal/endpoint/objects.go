@@ -16,11 +16,11 @@ type (
 		CoreCategory
 	}
 
-	CreateCategoryRequest struct {
+	InsertCategoryRequest struct {
 		Name string `json:"name" description:"Nome da categoria de produto"`
 	}
 
-	CreateCategoryResponse struct {
+	InsertCategoryResponse struct {
 		CoreCategory
 	}
 
@@ -42,5 +42,27 @@ type (
 		Limit      int            `json:"limit" default:"10"`
 		Offset     int            `json:"offset"`
 		Total      int64          `json:"total"`
+	}
+)
+
+type (
+	// PRODUCTS
+
+	Product struct {
+		ID          string `json:"id,omitempty"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		CategoryID  string `json:"category_id"`
+		Price       string `json:"price"`
+		CreatedAt   string `json:"created_at,omitempty" readOnly:"true"`
+		UpdatedAt   string `json:"updated_at,omitempty" readOnly:"true"`
+		DeletedAt   string `json:"deleted_at,omitempty" readOnly:"true"`
+	}
+
+	ProductList struct {
+		Products []Product `json:"products"`
+		Limit    int       `json:"limit" default:"10"`
+		Offset   int       `json:"offset"`
+		Total    int64     `json:"total"`
 	}
 )

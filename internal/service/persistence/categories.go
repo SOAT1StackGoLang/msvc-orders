@@ -11,12 +11,12 @@ import (
 
 const categoriesTable = "lanchonete_categories"
 
-type persistence struct {
+type catPersistence struct {
 	db  *gorm.DB
 	log kitlog.Logger
 }
 
-func (p *persistence) InsertCategory(ctx context.Context, in *models.Category) (*models.Category, error) {
+func (p *catPersistence) InsertCategory(ctx context.Context, in *models.Category) (*models.Category, error) {
 	var out *models.Category
 	cat := Category{
 		ID:        in.ID,
@@ -47,7 +47,7 @@ func (p *persistence) InsertCategory(ctx context.Context, in *models.Category) (
 	return out, nil
 }
 
-func (p *persistence) GetCategoryByID(ctx context.Context, id uuid.UUID) (*models.Category, error) {
+func (p *catPersistence) GetCategoryByID(ctx context.Context, id uuid.UUID) (*models.Category, error) {
 	cat := Category{}
 
 	if err := p.db.WithContext(ctx).Table(categoriesTable).
@@ -73,7 +73,7 @@ func (p *persistence) GetCategoryByID(ctx context.Context, id uuid.UUID) (*model
 	return out, nil
 }
 
-func (p *persistence) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+func (p *catPersistence) DeleteCategory(ctx context.Context, id uuid.UUID) error {
 	cat := Category{ID: id}
 	if err := p.db.WithContext(ctx).Table(categoriesTable).Delete(&cat).Error; err != nil {
 		p.log.Log(
@@ -87,7 +87,7 @@ func (p *persistence) DeleteCategory(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (p *persistence) ListCategories(ctx context.Context, limit int, offset int) (*models.CategoryList, error) {
+func (p *catPersistence) ListCategories(ctx context.Context, limit int, offset int) (*models.CategoryList, error) {
 	var total int64
 	var savedCats []Category
 
@@ -129,5 +129,5 @@ func (p *persistence) ListCategories(ctx context.Context, limit int, offset int)
 }
 
 func NewCategoriesPersistence(db *gorm.DB, log kitlog.Logger) CategoriesRepository {
-	return &persistence{db: db, log: log}
+	return &catPersistence{db: db, log: log}
 }
