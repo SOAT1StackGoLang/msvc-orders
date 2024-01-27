@@ -21,7 +21,7 @@ var (
 	connString string
 )
 
-func initializeApp() (*datastore.RedisStore, error) {
+func initializeApp() (datastore.RedisStore, error) {
 	flag.StringVar(&binding, "httpbind", ":8000", "address/port to bind listen socket")
 	flag.Parse()
 	godotenv.Load()
@@ -59,7 +59,7 @@ func initializeApp() (*datastore.RedisStore, error) {
 	return redisStore, nil
 }
 
-func debugChannelSubscriber(redisStore *datastore.RedisStore) error {
+func debugChannelSubscriber(redisStore datastore.RedisStore) error {
 	// Subscribe to the Redis channel if APP_LOG_LEVEL is set to debug
 	logger.Info("DEBUG MODE ON: Subscribing to Redis channel...")
 	ch, err := redisStore.SubscribeLog(context.Background())

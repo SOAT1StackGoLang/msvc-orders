@@ -6,6 +6,7 @@ require (
 	github.com/Boostport/migration v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/SOAT1StackGoLang/msvc-payments v0.1.0
+	github.com/SOAT1StackGoLang/msvc-production v0.0.0-00010101000000-000000000000
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/google/uuid v1.6.0
@@ -36,4 +37,5 @@ require (
 
 replace (
 	github.com/SOAT1StackGoLang/msvc-payments => ../msvc-payments
+	github.com/SOAT1StackGoLang/msvc-production => ../msvc-production
 )
