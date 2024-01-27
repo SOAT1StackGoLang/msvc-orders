@@ -7,6 +7,12 @@ FROM golang:alpine AS builder
 
 # Install git
 RUN apk add --no-cache git
+WORKDIR /tmp
+RUN git init
+ENV GOPRIVATE=github.com/SOAT1StackGoLang/
+ENV GO111MODULE=on 
+ARG GITHUB_ACCESS_TOKEN
+RUN git config --global url."https://$GITHUB_ACCESS_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
 # Set working directory
 WORKDIR /go/src/app
