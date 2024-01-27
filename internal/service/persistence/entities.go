@@ -214,6 +214,37 @@ type Payment struct {
 	Status    PaymentStatus
 }
 
+func paymentFromModels(in *models.Payment) *Payment {
+	out := &Payment{
+		ID:        in.ID,
+		CreatedAt: in.CreatedAt,
+		Value:     in.Price,
+		OrderID:   in.OrderID,
+		Status:    paymentStatusFromModel(in.Status),
+	}
+	if !in.UpdatedAt.IsZero() {
+		out.UpdatedAt.Valid = true
+		out.UpdatedAt.Time = in.UpdatedAt
+	}
+
+	return out
+}
+
+func (p *Payment) toModels() *models.Payment {
+	out := &models.Payment{
+		ID:        p.ID,
+		CreatedAt: p.CreatedAt,
+		Price:     p.Value,
+		OrderID:   p.OrderID,
+		Status:    paymentStatusToModel(p.Status),
+	}
+	if p.UpdatedAt.Valid {
+		out.UpdatedAt = p.UpdatedAt.Time
+	}
+
+	return out
+}
+
 type PaymentStatus string
 
 const (
@@ -221,3 +252,25 @@ const (
 	PAYMENT_STATUS_APPROVED               = "Aprovado"
 	PAYMENT_STATUS_REFUSED                = "Recusado"
 )
+
+func paymentStatusFromModel(in models.PaymentStatus) PaymentStatus {
+	switch in {
+	case models.PAYMENT_STATUS_OPEN:
+		return PAYMENT_SATUS_OPEN
+	case models.PAYMENT_STATUS_APPROVED:
+		return PAYMENT_STATUS_APPROVED
+	default:
+		return PAYMENT_STATUS_REFUSED
+	}
+}
+
+func paymentStatusToModel(in PaymentStatus) models.PaymentStatus {
+	switch in {
+	case PAYMENT_SATUS_OPEN:
+		return models.PAYMENT_STATUS_OPEN
+	case PAYMENT_STATUS_APPROVED:
+		return models.PAYMENT_STATUS_APPROVED
+	default:
+		return models.PAYMENT_SATUS_REFUSED
+	}
+}

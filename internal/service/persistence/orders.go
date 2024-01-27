@@ -48,7 +48,7 @@ func (o *ordersPersistence) GetOrder(ctx context.Context, orderID uuid.UUID) (*m
 	}
 	out = order.toModels()
 	return out, err
-} // done
+}
 
 func (o *ordersPersistence) GetOrderByPaymentID(ctx context.Context, paymentID uuid.UUID) (*models.Order, error) {
 	var out *models.Order
@@ -68,7 +68,7 @@ func (o *ordersPersistence) GetOrderByPaymentID(ctx context.Context, paymentID u
 
 	out = order.toModels()
 	return out, err
-} // DONE
+}
 
 func (o *ordersPersistence) CreateOrder(ctx context.Context, order *models.Order) (*models.Order, error) {
 	in := orderFromModels(order)
@@ -84,7 +84,7 @@ func (o *ordersPersistence) CreateOrder(ctx context.Context, order *models.Order
 	}
 
 	return in.toModels(), nil
-} // DONE
+}
 
 func (o *ordersPersistence) UpdateOrder(ctx context.Context, in *models.Order) (*models.Order, error) {
 	order := orderFromModels(in)
