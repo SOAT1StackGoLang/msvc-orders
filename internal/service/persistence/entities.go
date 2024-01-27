@@ -30,6 +30,60 @@ type Product struct {
 	Price       decimal.Decimal `json:"price"`
 }
 
+func (p *Product) toModel() models.Product {
+	out := models.Product{
+		ID:          p.ID,
+		CategoryID:  p.CategoryID,
+		CreatedAt:   p.CreatedAt,
+		Name:        p.Name,
+		Description: p.Description,
+		Price:       p.Price,
+	}
+
+	if p.UpdatedAt.Valid {
+		out.UpdatedAt = p.UpdatedAt.Time
+	}
+	return out
+}
+
+func productsToModel(in json.RawMessage) []models.Product {
+	var products []Product
+	err := json.Unmarshal(in, &products)
+	if err != nil {
+		// TODO handle properly
+		panic("failed to unmarshal products")
+	}
+
+	var outProducts []models.Product
+	for _, v := range products {
+		outProducts = append(outProducts, v.toModel())
+	}
+
+	return outProducts
+}
+
+func productFromModel(in []models.Product) json.RawMessage {
+	var products []OrderProduct
+	for _, p := range in {
+		oP := OrderProduct{
+			ID:          p.ID,
+			Name:        p.Name,
+			Description: p.Description,
+			CategoryID:  p.CategoryID,
+			Price:       decimal.Decimal{},
+		}
+		products = append(products, oP)
+	}
+
+	productsJSON, err := json.Marshal(products)
+	if err != nil {
+		//TODO handle properly
+		panic("failed to marshal products")
+	}
+
+	return productsJSON
+}
+
 type OrderProduct struct {
 	ID          uuid.UUID       `gorm:"id,primaryKey" json:"id"`
 	Name        string          `json:"name"`
@@ -63,6 +117,39 @@ type Order struct {
 	Products  json.RawMessage `json:"products" gorm:"type:jsonb"`
 }
 
+func (o *Order) toModels() *models.Order {
+	out := &models.Order{
+		ID:        o.ID,
+		UserID:    o.UserID,
+		PaymentID: o.PaymentID,
+		CreatedAt: o.CreatedAt,
+		Price:     o.Price,
+	}
+	if o.UpdatedAt.Valid {
+		out.UpdatedAt = o.UpdatedAt.Time
+	}
+	if o.DeletedAt.Valid {
+		out.DeletedAt = o.DeletedAt.Time
+	}
+
+	out.Status = orderStatusToModelStatus(o.Status)
+	out.Products = productsToModel(o.Products)
+
+	return out
+}
+
+func orderFromModels(in *models.Order) *Order {
+	return &Order{
+		ID:        in.ID,
+		UserID:    in.UserID,
+		PaymentID: in.PaymentID,
+		CreatedAt: in.CreatedAt,
+		Price:     in.Price,
+		Status:    orderStatusFromModel(in.Status),
+		Products:  productFromModel(in.Products),
+	}
+}
+
 type OrderStatus int
 
 const (
@@ -75,6 +162,48 @@ const (
 	ORDER_STATUS_FINISHED
 	ORDER_STATUS_CANCELED
 )
+
+func orderStatusToModelStatus(in OrderStatus) models.OrderStatus {
+	switch in {
+	case ORDER_STATUS_OPEN:
+		return models.ORDER_STATUS_OPEN
+	case ORDER_STATUS_WAITING_PAYMENT:
+		return models.ORDER_STATUS_WAITING_PAYMENT
+	case ORDER_STATUS_RECEIVED:
+		return models.ORDER_STATUS_RECEIVED
+	case ORDER_STATUS_PREPARING:
+		return models.ORDER_STATUS_PREPARING
+	case ORDER_STATUS_DONE:
+		return models.ORDER_STATUS_DONE
+	case ORDER_STATUS_FINISHED:
+		return models.ORDER_STATUS_FINISHED
+	case ORDER_STATUS_CANCELED:
+		return models.ORDER_STATUS_CANCELED
+	default:
+		return models.ORDER_STATUS_UNSET
+	}
+}
+
+func orderStatusFromModel(in models.OrderStatus) OrderStatus {
+	switch in {
+	case models.ORDER_STATUS_OPEN:
+		return ORDER_STATUS_OPEN
+	case models.ORDER_STATUS_WAITING_PAYMENT:
+		return ORDER_STATUS_WAITING_PAYMENT
+	case models.ORDER_STATUS_RECEIVED:
+		return ORDER_STATUS_RECEIVED
+	case models.ORDER_STATUS_PREPARING:
+		return ORDER_STATUS_PREPARING
+	case models.ORDER_STATUS_DONE:
+		return ORDER_STATUS_DONE
+	case models.ORDER_STATUS_FINISHED:
+		return ORDER_STATUS_FINISHED
+	case models.ORDER_STATUS_CANCELED:
+		return ORDER_STATUS_CANCELED
+	default:
+		return ORDER_STATUS_UNSET
+	}
+}
 
 type Payment struct {
 	ID        uuid.UUID `gorm:"id,primaryKey"`

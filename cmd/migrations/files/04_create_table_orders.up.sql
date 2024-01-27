@@ -4,7 +4,7 @@ create table public.lanchonete_orders
     created_at timestamptz    not null,
     updated_at timestamptz,
     deleted_at timestamptz,
-    user_id    uuid           not null,
+    user_id    uuid,
     products   json           not null,
     price      numeric(10, 2) not null,
     status     int default 0  not null,
