@@ -17,21 +17,16 @@ RUN git config --global url."https://$GITHUB_ACCESS_TOKEN:x-oauth-basic@github.c
 # Set working directory
 WORKDIR /go/src/app
 
-# Copy source code to working directory
 ADD ./ .
-
-# List files in the working directory (debugging)
 RUN ls -alth
-
-# Download dependencies
 RUN go get -d -v ./...
-
-# Build the application
 RUN go build -o /go/bin/app -v cmd/server/*.go
+RUN go build -o /go/bin/migs -v cmd/migrations/*.go
 
-# Runtime stage
+# final stage
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/app /app
-CMD /app
+COPY --from=builder /go/bin/migs /migs
+CMD /migs; /app
 EXPOSE 8000
