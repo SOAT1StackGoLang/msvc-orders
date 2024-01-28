@@ -44,7 +44,7 @@ jobs:
     - name: Debug Registry
       run: echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" && echo "$IMAGE_NAME"
     - name: Run build
-      run: earthly --push +all
+      run: earthly --push +all --ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
       working-directory: .
   trivy:
     uses: ./.github/workflows/trivy.yml
