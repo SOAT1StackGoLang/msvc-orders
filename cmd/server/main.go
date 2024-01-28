@@ -5,10 +5,13 @@ import (
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
+	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport/routes"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
+	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -22,14 +25,19 @@ func main() {
 		log.Panicf("failed initializing db: %s\n", err)
 	}
 
+	r := mux.NewRouter()
+
 	catRepo := persistence.NewCategoriesPersistence(gormDB, logger.InfoLogger)
 	categoriesSvc := service.NewCategoriesService(catRepo, logger.InfoLogger)
+	r = routes.NewCategoriesRouter(categoriesSvc, r, logger.InfoLogger)
 
 	productsRepo := persistence.NewProductsPersistence(gormDB, logger.InfoLogger)
 	_ = service.NewProductsService(productsRepo, logger.InfoLogger)
 
-	handler := transport.NewHTTPHandler(categoriesSvc, logger.InfoLogger)
-
 	logger.Info("Starting http server...")
-	transport.NewHTTPServer(":8080", handler)
+	transport.NewHTTPServer(":8080", muxToHttp(r))
+}
+
+func muxToHttp(r *mux.Router) http.Handler {
+	return r
 }
