@@ -8,14 +8,19 @@ import (
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
 	payments "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
+	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	production "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
 const ordersPendingPayment = "orders_pending_payment"
+const ordersProcessingPayment = "orders_processing_payment"
 const ordersPendingProduction = "orders_pending_production"
 
 type pendingOrders struct {
@@ -169,7 +174,7 @@ func (o *ordersSvc) Checkout(ctx context.Context, id uuid.UUID) (*models.Order, 
 		return nil, err
 	}
 
-	err = o.cache.RPush(ctx, ordersPendingPayment, orders)
+	err = o.cache.LPush(ctx, ordersPendingPayment, orders)
 	if err != nil {
 		o.log.Log(
 			"failed pushing into "+ordersPendingPayment,
@@ -193,126 +198,93 @@ func (o *ordersSvc) UpdateOrderStatus(ctx context.Context, orderID uuid.UUID, st
 	return o.ordersRepo.UpdateOrder(ctx, order)
 }
 
-func (o *ordersSvc) PoolOrderPaymentStatus() {
-	var (
-		ctx = context.Background()
+func (o *ordersSvc) ProcessPayment() {
+	var paidChannel = make(chan *pendingOrders, 1)
+	logger.Info("Starting payment pooling...")
 
-		start, end    int64
-		ids           []string
-		err           error
-		paymentStatus models.PaymentStatus
-	)
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	go o.processPayments(paidChannel)
 
 	for {
-		time.Sleep(1 * time.Second)
-		ids, err = o.cache.LRange(ctx, ordersPendingPayment, start, end)
-		if err != nil {
-			o.log.Log(
-				"error at cache",
-				zap.Int64("start", start),
-				zap.Int64("end", end),
-				zap.Error(err),
-			)
-			break
-		}
-		if len(ids) == 0 {
-			continue
-		}
-
-		paymentID, err := uuid.Parse(ids[0])
-		if err != nil {
-			o.log.Log(
-				"error parsing uuid",
-				zap.Int64("start", start),
-				zap.Int64("end", end),
-				zap.String("id", ids[0]),
-				zap.Error(err),
-			)
-			break
-		}
-
-		payment, err := o.paymentsAPI.GetPayment(payments.GetPaymentRequest{PaymentID: paymentID})
-		if err != nil {
-			o.log.Log(
-				"error getting payment from 3rd party",
-				zap.Int64("start", start),
-				zap.Int64("end", end),
-				zap.String("id", paymentID.String()),
-				zap.Error(err),
-			)
-			break
-		}
-
-		paymentStatus = models.PaymentStatusFromClearingService(payment.Status)
-		switch payment.Status {
-		case payments.PaymentStatusPaid:
-			if _, err = o.paymentsSvc.UpdatePayment(ctx, payment.Payment.ID, paymentStatus); err != nil {
-				o.log.Log("UpdatePayment INCONSISTENCY", zap.String("payment_id", payment.Payment.ID.String()), zap.Error(err))
+		select {
+		case <-shutdown:
+			logger.Info("Shutting down payment processing...")
+			return
+		case paid := <-paidChannel:
+			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
+			if err != nil {
+				logger.Error("failed updating payment status")
 				continue
 			}
 
-			if _, err = o.UpdateOrderStatus(ctx, payment.Payment.OrderID, models.ORDER_STATUS_RECEIVED); err != nil {
-				o.log.Log("UpdateOrderStatus INCONSISTENCY", zap.String("order_id", payment.Payment.OrderID.String()), zap.Error(err))
-				break
-			}
-
-			if err = o.cache.RPush(ctx, ordersPendingProduction, payment.Payment.OrderID.String()); err != nil {
-				o.log.Log(ordersPendingProduction+" INCONSISTENCY", zap.String("order_id", payment.Payment.ID.String()), zap.Error(err))
-			}
-
-			err := o.cache.LIndex(ctx, ordersPendingPayment, start)
+			_, err = o.productionAPI.UpdateOrder(production.UpdateOrderRequest{
+				OrderID: paid.ID,
+				Status:  production.ORDER_STATUS_PREPARING,
+			})
 			if err != nil {
-				o.log.Log(ordersPendingPayment+" INCONSISTENCY", zap.String("order_id", payment.Payment.ID.String()), zap.Error(err))
-				break
+				logger.Error("failed sending to production")
+				continue
+			}
+
+			_, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(paid.ID), models.ORDER_STATUS_PREPARING)
+			if err != nil {
+				logger.Error("failed updating oredr status")
+				continue
 			}
 		}
 	}
 }
 
-func (o *ordersSvc) NotifyProduction() {
-	var (
-		ctx = context.Background()
-
-		start, end int64
-		ids        []string
-		err        error
-	)
+func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	for {
-		time.Sleep(1 * time.Second)
-		ids, err = o.cache.LRange(ctx, ordersPendingPayment, start, end)
-		if err != nil {
-			o.log.Log(
-				"error at cache",
-				zap.Int64("start", start),
-				zap.Int64("end", end),
-				zap.Error(err),
-			)
-			break
-		}
-		if len(ids) == 0 {
-			continue
-		}
-		if err != nil {
-			o.log.Log(
-				"UpdateOrder failed",
-				zap.String("order_id", orderID.String()),
-				zap.Error(err),
-			)
-			return err
-		}
+		select {
+		case <-shutdown:
+			return
+		default:
+			time.Sleep(1 * time.Second)
+			registers, err := o.cache.LRange(context.Background(), ordersPendingPayment, 0, -1)
+			if err != nil {
+				logger.Error("error retrieving from cache")
+				return
+			}
 
-		_, err = o.UpdateOrderStatus(ctx, orderID, models.ORDER_STATUS_PREPARING)
-		if err != nil {
-			o.log.Log(
-				"UpdateOrderStatus failed",
-				zap.String("order_id", orderID.String()),
-				zap.Error(err),
-			)
+			for _, v := range registers {
+				var pO *pendingOrders
+				err = json.Unmarshal([]byte(v), pO)
+				if err != nil {
+					logger.Error("error unmarshalling from cache")
+					continue
+				}
+
+				pUID, err := uuid.Parse(pO.PaymentID)
+				if err != nil {
+					logger.Error("error parsing uuid from cache")
+					continue
+				}
+
+				payment, err := o.paymentsAPI.GetPayment(payments.GetPaymentRequest{PaymentID: pUID})
+				if err != nil {
+					logger.Error("error getting payment status")
+					continue
+				}
+
+				if payment.Payment.Status == payments.PaymentStatusPaid {
+					paidChannel <- &pendingOrders{
+						ID:        payment.Payment.OrderID.String(),
+						PaymentID: payment.Payment.ID.String(),
+					}
+					err = o.cache.LREM(context.Background(), ordersPendingPayment, 1, v)
+					if err != nil {
+						logger.Error("error deleting from cache")
+						return
+					}
+				}
+			}
 		}
-
-		err := o.cache.LIndex(ctx, ordersPendingPayment, start)
-
-		return err
 	}
 }

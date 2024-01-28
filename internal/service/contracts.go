@@ -33,8 +33,7 @@ type OrdersService interface {
 	ListOrders(ctx context.Context, limit, offset int) (*models.OrderList, error)
 	Checkout(ctx context.Context, paymentID uuid.UUID) (*models.Order, error)
 	UpdateOrderStatus(ctx context.Context, orderID uuid.UUID, status models.OrderStatus) (*models.Order, error)
-	PoolOrderPaymentStatus()
-	NotifyProduction()
+	ProcessPayment()
 }
 
 type PaymentsService interface {
