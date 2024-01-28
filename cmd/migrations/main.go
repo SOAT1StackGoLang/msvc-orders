@@ -15,7 +15,7 @@ var migFs embed.FS
 func main() {
 	godotenv.Load()
 	helpers.ReadPgxConnEnvs()
-	dsn := helpers.ToDsnWithDbName()
+	dsn := helpers.GetConnectionParams()
 	fmt.Printf("%+v\n", dsn)
 	dir := "files"
 

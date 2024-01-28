@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
-	"github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
+	paymentapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
 	"time"
@@ -13,7 +13,7 @@ import (
 
 type paymentsSvc struct {
 	repo   persistence.PaymentRepository
-	client *api.Client
+	client paymentapi.PaymentAPI
 	log    kitlog.Logger
 }
 
@@ -33,13 +33,13 @@ func (p *paymentsSvc) CreatePayment(ctx context.Context, order *models.Order) (*
 
 	receipt, err := p.repo.CreatePayment(ctx, payment)
 
-	_, err = p.client.CreatePayment(api.CreatePaymentRequest{Payment: api.Payment{
+	_, err = p.client.CreatePayment(paymentapi.CreatePaymentRequest{Payment: paymentapi.Payment{
 		ID:        payment.ID,
 		CreatedAt: payment.CreatedAt,
 		UpdatedAt: payment.UpdatedAt,
 		Price:     payment.Price,
 		OrderID:   payment.OrderID,
-		Status:    api.PaymentStatusPending,
+		Status:    paymentapi.PaymentStatusPending,
 	}})
 
 	if err != nil {
@@ -63,9 +63,10 @@ func (p *paymentsSvc) UpdatePayment(ctx context.Context, paymentID uuid.UUID, st
 	return updated, err
 }
 
-func NewPaymentsService(repo persistence.PaymentRepository, log kitlog.Logger) PaymentsService {
+func NewPaymentsService(repo persistence.PaymentRepository, api paymentapi.PaymentAPI, log kitlog.Logger) PaymentsService {
 	return &paymentsSvc{
-		repo: repo,
-		log:  log,
+		client: api,
+		repo:   repo,
+		log:    log,
 	}
 }

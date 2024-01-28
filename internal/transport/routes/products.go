@@ -21,7 +21,7 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 	}
 
 	r.Methods(http.MethodGet).Path("/product/{id}").Handler(httptransport.NewServer(prodEndpoints.GetProductEndpoint,
-		decodeGetCategoriesRequest,
+		decodeGetProductsRequest,
 		encodeResponse,
 		options...,
 	))
@@ -39,7 +39,6 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 		encodeResponse,
 		options...,
 	))
-	r.Methods(http.MethodGet).Path("/product/category/{id}").Handler()
 
 	return r
 }

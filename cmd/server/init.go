@@ -26,7 +26,7 @@ func initializeApp() (datastore.RedisStore, error) {
 	flag.Parse()
 	godotenv.Load()
 	helpers.ReadPgxConnEnvs()
-	connString = helpers.ToDsnWithDbName()
+	connString = helpers.GetConnectionParams()
 
 	logger.InitializeLogger()
 
