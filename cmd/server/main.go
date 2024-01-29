@@ -43,8 +43,10 @@ func main() {
 
 	ordersRepo := persistence.NewOrdersPersistence(gormDB, logger.InfoLogger)
 	ordersSvc := service.NewOrdersService(ordersRepo, productsSvc, paymentsSvc, logger.InfoLogger, cache)
+	r = routes.NewOrdersRouter(ordersSvc, r, logger.InfoLogger)
 
 	go ordersSvc.ProcessPayment()
+	// TODO CONSUMER FROM PRODUCTION
 
 	logger.Info("Starting http server...")
 	transport.NewHTTPServer(":8080", muxToHttp(r))

@@ -75,7 +75,7 @@ func (o *ordersSvc) GetOrderByPaymentID(ctx context.Context, paymentID uuid.UUID
 	return o.ordersRepo.GetOrderByPaymentID(ctx, paymentID)
 }
 
-func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product) (*models.Order, error) {
+func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product, userID uuid.UUID) (*models.Order, error) {
 	var order *models.Order
 
 	if len(products) == 0 {
@@ -105,6 +105,10 @@ func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product) 
 		CreatedAt: time.Now(),
 		Status:    models.ORDER_STATUS_OPEN,
 		Products:  products,
+	}
+
+	if userID != uuid.Nil {
+		order.UserID = userID
 	}
 
 	for _, v := range products {
@@ -291,3 +295,5 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 		}
 	}
 }
+
+// TODO HANDLE CONSUMED PRODUCITON MSG AND UPDATE ORDER STATUS

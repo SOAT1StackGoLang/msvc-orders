@@ -7,7 +7,6 @@ import (
 )
 
 //go:generate mockgen -source=contracts.go -package=mocks -destination=../mocks/contracts_mock.go
-
 type CategoriesService interface {
 	GetCategory(ctx context.Context, id uuid.UUID) (*models.Category, error)
 	InsertCategory(ctx context.Context, in *models.Category) (*models.Category, error)
@@ -27,7 +26,7 @@ type ProductsService interface {
 type OrdersService interface {
 	GetOrder(ctx context.Context, orderID uuid.UUID) (*models.Order, error)
 	GetOrderByPaymentID(ctx context.Context, paymentID uuid.UUID) (*models.Order, error)
-	CreateOrder(ctx context.Context, products []models.Product) (*models.Order, error)
+	CreateOrder(ctx context.Context, products []models.Product, userID uuid.UUID) (*models.Order, error)
 	UpdateOrderItems(ctx context.Context, orderID uuid.UUID, products []models.Product) (*models.Order, error)
 	DeleteOrder(ctx context.Context, orderID uuid.UUID) error
 	ListOrders(ctx context.Context, limit, offset int) (*models.OrderList, error)

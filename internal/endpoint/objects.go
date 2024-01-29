@@ -123,8 +123,29 @@ type (
 )
 
 type (
+	ListOrderRequest struct {
+		Limit  int `json:"limt"`
+		Offset int `json:"offset"`
+	}
+
 	GetOrderRequest struct {
 		ID string `json:"id"`
+	}
+
+	DeleteOrderRequest struct {
+		ID string `json:"id"`
+	}
+
+	CheckoutOrderRequest struct {
+		ID string `json:"id"`
+	}
+
+	DeleteOrderResponse struct {
+		Deleted string `json:"deleted"`
+	}
+
+	GetOrderByPaymentIDRequest struct {
+		PaymentID string `json:"payment_id"`
 	}
 
 	// ORDERS
@@ -144,32 +165,16 @@ type (
 		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`
 	}
 
-	InsertionOrderSwagger struct {
-		UserID      string   `json:"user_id" description:"ID do dono do pedido"`
-		ProductsIDs []string `json:"products_ids" description:"Lista de ID dos produtos separados por vírgula"`
-	}
-
-	UpdateOrder struct {
-		ID string `json:"id" description:"ID do Pedido"`
-		CreateOrderRequest
+	UpdateOrderRequest struct {
+		ID          string   `json:"id"`
+		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`
 	}
 
 	OrderList struct {
 		Orders []OrderResponse `json:"orders"`
 		Limit  int             `json:"limit" default:"10"`
 		Offset int             `json:"offset"`
-		Total  int64           `json:"total"`
-	}
-
-	OrderCheckoutRequest struct {
-		UserID  string `json:"user_id"`
-		OrderID string `json:"order_id" description:"ID do Pedido"`
-	}
-
-	OrderStatusUpdate struct {
-		OrderID string `json:"order_id" description:"Código de identificação do pedido"`
-		UserID  string `json:"user_id" description:"Código de descrição do usuário requerente"`
-		Status  string `json:"status" description:"Status para qual deseja mudar o pedido" enum:"Recebido|Preparacao|Pronto|Finalizado|Cancelado"`
+		Total  int             `json:"total"`
 	}
 )
 
