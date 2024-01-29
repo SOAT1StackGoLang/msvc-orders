@@ -32,11 +32,11 @@ func makeListCategoriesEndpoint(svc service.CategoriesService) endpoint.Endpoint
 		req := request.(ListCategoriesRequest)
 
 		out := ListCategoriesResponse{
-			Limit:  req.Limit,
-			Offset: req.Offset,
+			Limit:  int(req.Limit),
+			Offset: int(req.Offset),
 		}
 
-		cats, err := svc.ListCategories(ctx, req.Limit, req.Offset)
+		cats, err := svc.ListCategories(ctx, int(req.Limit), int(req.Offset))
 		if err != nil {
 			return nil, err
 		}

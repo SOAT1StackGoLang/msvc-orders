@@ -75,7 +75,7 @@ func (o *ordersSvc) GetOrderByPaymentID(ctx context.Context, paymentID uuid.UUID
 	return o.ordersRepo.GetOrderByPaymentID(ctx, paymentID)
 }
 
-func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product) (*models.Order, error) {
+func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product, userID uuid.UUID) (*models.Order, error) {
 	var order *models.Order
 
 	if len(products) == 0 {
@@ -105,6 +105,10 @@ func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product) 
 		CreatedAt: time.Now(),
 		Status:    models.ORDER_STATUS_OPEN,
 		Products:  products,
+	}
+
+	if userID != uuid.Nil {
+		order.UserID = userID
 	}
 
 	for _, v := range products {
@@ -210,9 +214,10 @@ func (o *ordersSvc) ProcessPayment() {
 	for {
 		select {
 		case <-shutdown:
-			logger.Info("Shutting down payment processing...")
+			logger.Info("Shutting down ProcessPayment...")
 			return
 		case paid := <-paidChannel:
+			logger.Info(zap.String("payment_id", paid.PaymentID).String)
 			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
 			if err != nil {
 				logger.Error("failed updating payment status")
@@ -235,6 +240,7 @@ func (o *ordersSvc) ProcessPayment() {
 			}
 		}
 	}
+
 }
 
 func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
@@ -244,6 +250,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 	for {
 		select {
 		case <-shutdown:
+			logger.Info("Shutting down processPayments...")
 			return
 		default:
 			time.Sleep(1 * time.Second)
@@ -288,3 +295,5 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 		}
 	}
 }
+
+// TODO HANDLE CONSUMED PRODUCITON MSG AND UPDATE ORDER STATUS

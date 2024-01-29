@@ -90,13 +90,24 @@ func (p *catPersistence) DeleteCategory(ctx context.Context, id uuid.UUID) error
 func (p *catPersistence) ListCategories(ctx context.Context, limit int, offset int) (*models.CategoryList, error) {
 	var total int64
 	var savedCats []Category
-
 	var err error
+
+	// First, perform the count operation
+	if err = p.db.WithContext(ctx).Table(categoriesTable).
+		Count(&total).
+		Error; err != nil {
+		p.log.Log(
+			"failed counting categories",
+			zap.Error(err),
+		)
+		return nil, err
+	}
+
 	if err = p.db.WithContext(ctx).Table(categoriesTable).
 		Limit(limit).
 		Offset(offset).
-		Count(&total).
-		Scan(&savedCats).Error; err != nil {
+		Find(&savedCats).
+		Error; err != nil {
 		p.log.Log(
 			"failed listing categories",
 			zap.Error(err),
@@ -105,7 +116,7 @@ func (p *catPersistence) ListCategories(ctx context.Context, limit int, offset i
 	}
 
 	out := &models.CategoryList{}
-	outList := make([]*models.Category, 0, total)
+	outList := make([]*models.Category, 0)
 
 	for _, c := range savedCats {
 		out := &models.Category{

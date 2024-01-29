@@ -38,8 +38,8 @@ type (
 	}
 
 	ListCategoriesRequest struct {
-		Limit  int `json:"limit" default:"10" description:"Quantidade de registros"`
-		Offset int `json:"offset"`
+		Limit  int64 `json:"limit" default:"10" description:"Quantidade de registros"`
+		Offset int64 `json:"offset"`
 	}
 
 	ListCategoriesResponse struct {
@@ -121,6 +121,90 @@ type (
 		Status    string `json:"status"`
 	}
 )
+
+type (
+	ListOrderRequest struct {
+		Limit  int `json:"limt"`
+		Offset int `json:"offset"`
+	}
+
+	GetOrderRequest struct {
+		ID string `json:"id"`
+	}
+
+	DeleteOrderRequest struct {
+		ID string `json:"id"`
+	}
+
+	CheckoutOrderRequest struct {
+		ID string `json:"id"`
+	}
+
+	DeleteOrderResponse struct {
+		Deleted string `json:"deleted"`
+	}
+
+	GetOrderByPaymentIDRequest struct {
+		PaymentID string `json:"payment_id"`
+	}
+
+	// ORDERS
+	OrderResponse struct {
+		ID        string            `json:"id" description:"ID do Pedido"`
+		PaymentID string            `json:"payment_id,omitempty" description:"ID do pagamento"`
+		CreatedAt string            `json:"created_at" description:"Data de criação"`
+		UpdatedAt string            `json:"updated_at,omitempty" description:"Data de atualização"`
+		DeletedAt string            `json:"deleted_at,omitempty" description:"Data de deleção"`
+		Price     string            `json:"price" description:"Preço do pedido"`
+		Status    string            `json:"status" description:"Status do pedido"`
+		Products  []ProductResponse `json:"products" description:"Lista de Pedidos"`
+	}
+
+	CreateOrderRequest struct {
+		UserID      string   `json:"user_id" description:"ID do dono do pedido"`
+		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`
+	}
+
+	UpdateOrderRequest struct {
+		ID          string   `json:"id"`
+		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`
+	}
+
+	OrderList struct {
+		Orders []OrderResponse `json:"orders"`
+		Limit  int             `json:"limit" default:"10"`
+		Offset int             `json:"offset"`
+		Total  int             `json:"total"`
+	}
+)
+
+func OrderResponseFromModel(in *models.Order) OrderResponse {
+	out := OrderResponse{
+		ID:        in.ID.String(),
+		PaymentID: in.PaymentID.String(),
+		CreatedAt: in.CreatedAt.String(),
+		UpdatedAt: "",
+		DeletedAt: "",
+		Price:     helpers.ParseDecimalToString(in.Price),
+		Status:    string(in.Status),
+		Products:  nil,
+	}
+
+	if !in.UpdatedAt.IsZero() {
+		out.UpdatedAt = in.UpdatedAt.String()
+	}
+
+	if !in.DeletedAt.IsZero() {
+		out.DeletedAt = in.DeletedAt.String()
+	}
+
+	var prods []ProductResponse
+	for _, p := range in.Products {
+		prods = append(prods, ProductResponseFromModel(&p))
+	}
+	out.Products = prods
+	return out
+}
 
 func ProductResponseFromModel(in *models.Product) ProductResponse {
 	out := ProductResponse{
