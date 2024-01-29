@@ -2,6 +2,7 @@ VERSION 0.7
 all:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +msvc
     BUILD --platform=linux/amd64 --platform=linux/arm64 +debug
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +migrations
 amd64:
     BUILD --platform=linux/amd64 +msvc
     BUILD --platform=linux/amd64 +debug
