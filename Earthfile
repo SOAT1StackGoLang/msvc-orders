@@ -32,8 +32,35 @@ compile:
     RUN GOARM=${VARIANT#v} CGO_ENABLED=0 go build \
         -installsuffix 'static' \
         -o compile/app cmd/server/*.go
+    RUN GOARM=${VARIANT#v} CGO_ENABLED=0 go build \
+        -installsuffix 'static' \
+        -o compile/migs cmd/migrations/*.go
     SAVE ARTIFACT compile/app /app AS LOCAL compile/app
+    SAVE ARTIFACT compile/migs /migs AS LOCAL compile/migs
 #--ldflags "-X 'msvc.Version=v0.0.3' -X 'msvc.BuildTime=$(date "+%H:%M:%S--%d/%m/%Y")' -X 'msvc.GitCommit=$(git rev-parse --short HEAD)'" \
+
+migrations:
+    ARG EARTHLY_TARGET_TAG_DOCKER
+    ARG EARTHLY_GIT_SHORT_HASH
+    ARG TARGETPLATFORM
+    ARG TARGETARCH
+    ARG TARGETVARIANT
+    FROM --platform=$TARGETPLATFORM gcr.io/distroless/static
+    ## enable multiple debug version with shell
+    #FROM --platform=$TARGETPLATFORM gcr.io/distroless/static:debug
+    #FROM --platform=$TARGETPLATFORM alpine:latest
+    LABEL org.opencontainers.image.source=https://github.com/soat1stackgolang/tech-challenge
+    LABEL org.opencontainers.image.description="Migrations Image only have the migrations binary and nothing else"
+    WORKDIR /
+    COPY \
+        --platform=linux/amd64 \
+        (+compile/migs --GOARCH=$TARGETARCH --VARIANT=$TARGETVARIANT) /migs
+    ENV GIN_MODE=release
+    ENTRYPOINT ["/migs"]
+    EXPOSE 8080
+    SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:migs-$EARTHLY_TARGET_TAG_DOCKER
+    SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:migs-$EARTHLY_GIT_SHORT_HASH
+
 
 msvc:
     ARG EARTHLY_TARGET_TAG_DOCKER
@@ -53,7 +80,7 @@ msvc:
         (+compile/app --GOARCH=$TARGETARCH --VARIANT=$TARGETVARIANT) /app
     ENV GIN_MODE=release
     ENTRYPOINT ["/app"]
-    EXPOSE 8000
+    EXPOSE 8080
     SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:msvc-$EARTHLY_TARGET_TAG_DOCKER
     SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:msvc-$EARTHLY_GIT_SHORT_HASH
 
@@ -73,8 +100,11 @@ debug:
     COPY \
         --platform=linux/amd64 \
         (+compile/app --GOARCH=$TARGETARCH --VARIANT=$TARGETVARIANT) /app
+    COPY \
+        --platform=linux/amd64 \
+        (+compile/migs --GOARCH=$TARGETARCH --VARIANT=$TARGETVARIANT) /migs
     ENV GIN_MODE=release
-    CMD /app
-    EXPOSE 8000
+    CMD /migs; /app
+    EXPOSE 8080
     SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:debug-$EARTHLY_TARGET_TAG_DOCKER
     SAVE IMAGE --push ghcr.io/soat1stackgolang/msvc-orders:debug-$EARTHLY_GIT_SHORT_HASH
