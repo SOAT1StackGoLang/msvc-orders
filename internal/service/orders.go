@@ -210,9 +210,10 @@ func (o *ordersSvc) ProcessPayment() {
 	for {
 		select {
 		case <-shutdown:
-			logger.Info("Shutting down payment processing...")
+			logger.Info("Shutting down ProcessPayment...")
 			return
 		case paid := <-paidChannel:
+			logger.Info(zap.String("payment_id", paid.PaymentID).String)
 			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
 			if err != nil {
 				logger.Error("failed updating payment status")
@@ -235,6 +236,7 @@ func (o *ordersSvc) ProcessPayment() {
 			}
 		}
 	}
+
 }
 
 func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
@@ -244,6 +246,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 	for {
 		select {
 		case <-shutdown:
+			logger.Info("Shutting down processPayments...")
 			return
 		default:
 			time.Sleep(1 * time.Second)

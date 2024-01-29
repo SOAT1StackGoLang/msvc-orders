@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	_, err := initializeApp()
+	cache, err := initializeApp()
 	log.Println("Bootstrapping msvc-orders...")
 
 	gormDB, err := gorm.Open(postgres.Open(connString), &gorm.Config{
@@ -40,6 +40,11 @@ func main() {
 	paymentsRepo := persistence.NewPaymentsPersistence(gormDB, logger.InfoLogger)
 	paymentsSvc := service.NewPaymentsService(paymentsRepo, paymentsClient, logger.InfoLogger)
 	r = routes.NewPaymentsRouter(paymentsSvc, r, logger.InfoLogger)
+
+	ordersRepo := persistence.NewOrdersPersistence(gormDB, logger.InfoLogger)
+	ordersSvc := service.NewOrdersService(ordersRepo, productsSvc, paymentsSvc, logger.InfoLogger, cache)
+
+	go ordersSvc.ProcessPayment()
 
 	logger.Info("Starting http server...")
 	transport.NewHTTPServer(":8080", muxToHttp(r))
