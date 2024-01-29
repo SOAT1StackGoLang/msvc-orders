@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
@@ -17,11 +18,14 @@ import (
 
 func main() {
 	cache, err := initializeApp()
-	log.Println("Bootstrapping msvc-orders...")
+	if err != nil {
+		panic(fmt.Sprintf("unable to connect "))
+	}
 
 	gormDB, err := gorm.Open(postgres.Open(connString), &gorm.Config{
 		SkipDefaultTransaction: true,
 	})
+
 	if err != nil {
 		log.Panicf("failed initializing db: %s\n", err)
 	}
@@ -44,8 +48,8 @@ func main() {
 	ordersRepo := persistence.NewOrdersPersistence(gormDB, logger.InfoLogger)
 	ordersSvc := service.NewOrdersService(ordersRepo, productsSvc, paymentsSvc, logger.InfoLogger, cache)
 	r = routes.NewOrdersRouter(ordersSvc, r, logger.InfoLogger)
-
-	go ordersSvc.ProcessPayment()
+	//
+	//go ordersSvc.ProcessPayment()
 	// TODO CONSUMER FROM PRODUCTION
 
 	logger.Info("Starting http server...")

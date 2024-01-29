@@ -15,7 +15,7 @@ type (
 		UpdateOrderItemsEndpoint endpoint.Endpoint
 		ListOrdersEndpoint       endpoint.Endpoint
 		DeleteOrderEndpoint      endpoint.Endpoint
-		CheckoutEndpoint         endpoint.Endpoint
+		OrderCheckoutEndpoint    endpoint.Endpoint
 		GetOrderByPaymentID      endpoint.Endpoint
 	}
 )
@@ -26,7 +26,7 @@ func MakeOrdersEndpoint(svc service.OrdersService) OrdersEndpoint {
 		CreateOrderEndpoint:      makeCreateOrderEndpoint(svc),
 		UpdateOrderItemsEndpoint: makeUpdateOrderItemsEndpoint(svc),
 		DeleteOrderEndpoint:      makeDeleteOrderEndpoint(svc),
-		CheckoutEndpoint:         makeCheckoutEndpoint(svc),
+		OrderCheckoutEndpoint:    makeOrderCheckoutEndpoint(svc),
 		GetOrderByPaymentID:      makeGetOrderByPaymentIDEndpoint(svc),
 		ListOrdersEndpoint:       makeListOrdersEndpoint(svc),
 	}
@@ -73,7 +73,7 @@ func makeGetOrderByPaymentIDEndpoint(svc service.OrdersService) endpoint.Endpoin
 	}
 }
 
-func makeCheckoutEndpoint(svc service.OrdersService) endpoint.Endpoint {
+func makeOrderCheckoutEndpoint(svc service.OrdersService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(CheckoutOrderRequest)
 

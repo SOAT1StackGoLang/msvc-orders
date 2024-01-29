@@ -38,8 +38,8 @@ type (
 	}
 
 	ListCategoriesRequest struct {
-		Limit  int `json:"limit" default:"10" description:"Quantidade de registros"`
-		Offset int `json:"offset"`
+		Limit  int64 `json:"limit" default:"10" description:"Quantidade de registros"`
+		Offset int64 `json:"offset"`
 	}
 
 	ListCategoriesResponse struct {

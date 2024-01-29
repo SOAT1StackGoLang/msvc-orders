@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/endpoint"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
+	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	kittransport "github.com/go-kit/kit/transport"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -29,6 +30,13 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
+	r.Methods(http.MethodGet).Path("/category/all").Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").Handler(httptransport.NewServer(
+		catEndpoints.ListCategoriesEndpoint,
+		decodeListCategoriesRequest,
+		encodeResponse,
+		options...,
+	))
+
 	r.Methods(http.MethodGet).Path("/category/{id}").Handler(httptransport.NewServer(
 		catEndpoints.GetCategoryEndpoint,
 		decodeGetCategoriesRequest,
@@ -50,24 +58,19 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 		options...,
 	))
 
-	r.Methods(http.MethodGet).Path("/category/all").Handler(httptransport.NewServer(
-		catEndpoints.ListCategoriesEndpoint,
-		decodeListCategoriesRequest,
-		encodeResponse,
-		options...,
-	))
-
 	return r
 }
 
 func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	query := r.URL.Query()
-
 	limit := query.Get("limit")
 
 	limitInt, err := strconv.ParseInt(limit, 10, 64)
 	if err != nil {
 		return nil, err
+	}
+	if limitInt == 0 {
+		return nil, ErrBadRequest
 	}
 
 	offset := query.Get("offset")
@@ -78,8 +81,8 @@ func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request an
 	}
 
 	return endpoint.ListCategoriesRequest{
-		Limit:  int(limitInt),
-		Offset: int(offsetInt),
+		Limit:  limitInt,
+		Offset: offsetInt,
 	}, nil
 
 }
@@ -107,6 +110,7 @@ func decodeInsertCategoriesRequest(_ context.Context, r *http.Request) (request 
 }
 
 func decodeGetCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
+	logger.Info("decodeGetCategoriesRequest")
 	vars := mux.Vars(r)
 
 	id, ok := vars["id"]
