@@ -5,9 +5,11 @@ all:
 amd64:
     BUILD --platform=linux/amd64 +msvc
     BUILD --platform=linux/amd64 +debug
+    BUILD --platform=linux/amd64 +migrations
 arm64:
     BUILD --platform=linux/arm64 +msvc
     BUILD --platform=linux/arm64 +debug
+    BUILD --platform=linux/arm64 +migrations
 file:
     LOCALLY
     SAVE ARTIFACT ./
