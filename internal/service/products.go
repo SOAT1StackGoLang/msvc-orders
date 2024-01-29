@@ -23,6 +23,7 @@ func (p *productsSvc) InsertProduct(ctx context.Context, in *models.Product) (*m
 	if in.Price == decimal.Zero {
 		return nil, helpers.ErrBadRequest
 	}
+	in.ID = uuid.New()
 	out, err := p.productRepo.InsertProduct(ctx, in)
 	return out, err
 }

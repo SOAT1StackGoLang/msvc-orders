@@ -57,6 +57,12 @@ type (
 		ID string `json:"id"`
 	}
 
+	ListProductsByCategoryRequest struct {
+		ID     string `json:"id"`
+		Limit  int    `json:"limit"`
+		Offset int    `json:"offset"`
+	}
+
 	DeleteProductRequest struct {
 		ID string `json:"id"`
 	}
@@ -95,7 +101,24 @@ type (
 		Products []ProductResponse `json:"products"`
 		Limit    int               `json:"limit" default:"10"`
 		Offset   int               `json:"offset"`
-		Total    int64             `json:"total"`
+		Total    int               `json:"total"`
+	}
+)
+
+type (
+	// PAYMENT
+
+	GetPaymentRequest struct {
+		ID string `json:"id"`
+	}
+
+	GetPaymentResponse struct {
+		ID        string `json:"id"`
+		CreatedAt string `json:"created_at"`
+		UpdatedAt string `json:"updated_at"`
+		Price     string `json:"price"`
+		OrderID   string `json:"order_id"`
+		Status    string `json:"status"`
 	}
 )
 

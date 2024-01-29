@@ -11,19 +11,49 @@ import (
 
 type (
 	ProductsEndpoints struct {
-		GetProductEndpoint    endpoint.Endpoint
-		InsertProductEndpoint endpoint.Endpoint
-		UpdateProductEndpoint endpoint.Endpoint
-		DeleteProductEndpoint endpoint.Endpoint
+		GetProductEndpoint     endpoint.Endpoint
+		InsertProductEndpoint  endpoint.Endpoint
+		UpdateProductEndpoint  endpoint.Endpoint
+		DeleteProductEndpoint  endpoint.Endpoint
+		ListProductsByCategory endpoint.Endpoint
 	}
 )
 
 func MakeProductsEndpoint(svc service.ProductsService) ProductsEndpoints {
 	return ProductsEndpoints{
-		GetProductEndpoint:    makeGetProductsEndpoint(svc),
-		InsertProductEndpoint: makeInsertProductEndpoint(svc),
-		UpdateProductEndpoint: makeUpdateProductEndpoint(svc),
-		DeleteProductEndpoint: makeDeleteProductEndpoint(svc),
+		GetProductEndpoint:     makeGetProductsEndpoint(svc),
+		InsertProductEndpoint:  makeInsertProductEndpoint(svc),
+		UpdateProductEndpoint:  makeUpdateProductEndpoint(svc),
+		DeleteProductEndpoint:  makeDeleteProductEndpoint(svc),
+		ListProductsByCategory: makeListProductsByCategory(svc),
+	}
+}
+
+func makeListProductsByCategory(svc service.ProductsService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(ListProductsByCategoryRequest)
+
+		uid, err := uuid.Parse(req.ID)
+		if err != nil {
+			return nil, err
+		}
+		cats, err := svc.ListProductsByCategory(ctx, uid, req.Limit, req.Offset)
+		if err != nil {
+			return nil, err
+		}
+
+		out := ProductList{
+			Products: make([]ProductResponse, 0, len(cats.Products)),
+			Limit:    req.Limit,
+			Offset:   req.Offset,
+			Total:    len(cats.Products),
+		}
+		for k, v := range cats.Products {
+			out.Products[k] = ProductResponseFromModel(v)
+		}
+
+		return out, nil
+
 	}
 }
 

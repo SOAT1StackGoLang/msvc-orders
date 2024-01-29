@@ -6,6 +6,7 @@ import (
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport/routes"
+	paymentsapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
@@ -32,7 +33,13 @@ func main() {
 	r = routes.NewCategoriesRouter(categoriesSvc, r, logger.InfoLogger)
 
 	productsRepo := persistence.NewProductsPersistence(gormDB, logger.InfoLogger)
-	_ = service.NewProductsService(productsRepo, logger.InfoLogger)
+	productsSvc := service.NewProductsService(productsRepo, logger.InfoLogger)
+	r = routes.NewProductsRouter(productsSvc, r, logger.InfoLogger)
+
+	paymentsClient := paymentsapi.NewClient(paymentURI, logger.InfoLogger)
+	paymentsRepo := persistence.NewPaymentsPersistence(gormDB, logger.InfoLogger)
+	paymentsSvc := service.NewPaymentsService(paymentsRepo, paymentsClient, logger.InfoLogger)
+	r = routes.NewPaymentsRouter(paymentsSvc, r, logger.InfoLogger)
 
 	logger.Info("Starting http server...")
 	transport.NewHTTPServer(":8080", muxToHttp(r))

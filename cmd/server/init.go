@@ -19,6 +19,7 @@ import (
 var (
 	binding    string
 	connString string
+	paymentURI string
 )
 
 func initializeApp() (datastore.RedisStore, error) {
@@ -26,6 +27,7 @@ func initializeApp() (datastore.RedisStore, error) {
 	flag.Parse()
 	godotenv.Load()
 	helpers.ReadPgxConnEnvs()
+	paymentURI = os.Getenv("PAYMENT_URI")
 	connString = helpers.GetConnectionParams()
 
 	logger.InitializeLogger()

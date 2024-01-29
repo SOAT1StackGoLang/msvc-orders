@@ -70,7 +70,7 @@ func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request an
 		return nil, err
 	}
 
-	offset := query.Get("limit")
+	offset := query.Get("offset")
 
 	offsetInt, err := strconv.ParseInt(offset, 10, 64)
 	if err != nil {

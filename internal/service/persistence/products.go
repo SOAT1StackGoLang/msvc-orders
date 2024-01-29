@@ -20,7 +20,7 @@ type productsPersistence struct {
 }
 
 func (p *productsPersistence) GetProduct(ctx context.Context, id uuid.UUID) (*models.Product, error) {
-	var out *models.Product
+	out := &models.Product{}
 	product := Product{}
 
 	if err := p.db.WithContext(ctx).Table(productsTable).
@@ -34,6 +34,7 @@ func (p *productsPersistence) GetProduct(ctx context.Context, id uuid.UUID) (*mo
 	}
 
 	out.ID = product.ID
+	out.Name = product.Name
 	out.Description = product.Description
 	out.CategoryID = product.CategoryID
 	out.Price = product.Price
