@@ -19,14 +19,14 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	r.Methods(http.MethodGet).Path("/order/{id}").Handler(httptransport.NewServer(
-		ordersEnpoints.GetOrderEndpoint,
+	r.Methods(http.MethodGet).Path("/order/all").Queries("limit", "{limit:[0-9]+", "offset", "{offset:[0-9]+").Handler(httptransport.NewServer(
+		ordersEnpoints.ListOrdersEndpoint,
 		mockDecoder,
 		encodeResponse,
 		options...,
 	))
-	r.Methods(http.MethodGet).Path("/order/all").Queries("limit", "{limit:[0-9]+", "offset", "{offset:[0-9]+").Handler(httptransport.NewServer(
-		ordersEnpoints.ListOrdersEndpoint,
+	r.Methods(http.MethodGet).Path("/order/{id}").Handler(httptransport.NewServer(
+		ordersEnpoints.GetOrderEndpoint,
 		mockDecoder,
 		encodeResponse,
 		options...,
