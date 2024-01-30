@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	paymentapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
+	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
 	"time"
@@ -43,7 +44,7 @@ func (p *paymentsSvc) CreatePayment(ctx context.Context, order *models.Order) (*
 	}})
 
 	if err != nil {
-		return nil, errors.New("failed creating payment")
+		logger.Error(fmt.Sprintf("%s: %s", "failed creating payment ", err.Error()))
 	}
 
 	return receipt, nil

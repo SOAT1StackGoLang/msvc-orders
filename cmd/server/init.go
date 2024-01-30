@@ -17,17 +17,22 @@ import (
 // It returns a pointer to the RedisStore and an error if any.
 
 var (
-	binding    string
-	connString string
-	paymentURI string
+	binding       string
+	connString    string
+	paymentURI    string
+	productionURI string
 )
 
 func initializeApp() (datastore.RedisStore, error) {
 	flag.StringVar(&binding, "httpbind", ":8000", "address/port to bind listen socket")
 	flag.Parse()
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		logger.InfoLogger.Log("load err", err.Error())
+	}
 	helpers.ReadPgxConnEnvs()
 	paymentURI = os.Getenv("PAYMENT_URI")
+	productionURI = os.Getenv("PRODUCTION_URI")
 	connString = helpers.GetConnectionParams()
 
 	logger.InitializeLogger()

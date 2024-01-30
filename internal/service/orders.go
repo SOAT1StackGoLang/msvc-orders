@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
@@ -58,15 +59,20 @@ func NewOrdersService(
 	paySvc PaymentsService,
 	log kitlog.Logger,
 	cache datastore.RedisStore,
+	paymentAPI payments.PaymentAPI,
+	productionAPI production.ProductionAPI,
 ) OrdersService {
 	svc := &ordersSvc{
-		cache:       cache,
-		ordersRepo:  repo,
-		productsSvc: prodSvc,
-		paymentsSvc: paySvc,
-		log:         log,
+		cache:         cache,
+		ordersRepo:    repo,
+		productsSvc:   prodSvc,
+		paymentsSvc:   paySvc,
+		log:           log,
+		paymentsAPI:   paymentAPI,
+		productionAPI: productionAPI,
 	}
 
+	go svc.ProcessPayment()
 	go svc.subscribeToProductionSvc()
 
 	return svc
@@ -76,10 +82,7 @@ func (o *ordersSvc) subscribeToProductionSvc() {
 	ctx := context.Background()
 	sub, err := o.cache.Subscribe(ctx, productionpkg.OrderStatusChannel)
 	if err != nil {
-		o.log.Log(
-			"error subscribing to order status updates",
-			zap.Error(err),
-		)
+		logger.Info("error subscribing to order status updates")
 		return
 	}
 
@@ -157,10 +160,7 @@ func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product, 
 		Status:    models.ORDER_STATUS_OPEN,
 		Products:  products,
 	}
-
-	if userID != uuid.Nil {
-		order.UserID = userID
-	}
+	order.UserID = userID
 
 	for _, v := range products {
 		order.Price = order.Price.Add(v.Price)
@@ -271,7 +271,7 @@ func (o *ordersSvc) ProcessPayment() {
 			logger.Info(zap.String("payment_id", paid.PaymentID).String)
 			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
 			if err != nil {
-				logger.Error("failed updating payment status")
+				logger.Error(fmt.Sprintf("%s: %s", "failed updating payment status", err.Error()))
 				continue
 			}
 
@@ -280,7 +280,7 @@ func (o *ordersSvc) ProcessPayment() {
 				Status:  production.ORDER_STATUS_PREPARING,
 			})
 			if err != nil {
-				logger.Error("failed sending to production")
+				logger.Error(fmt.Sprintf("%s: %s", "failed sending order to production", err.Error()))
 				continue
 			}
 
@@ -312,7 +312,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 			}
 
 			for _, v := range registers {
-				var pO *pendingOrders
+				pO := &pendingOrders{}
 				err = json.Unmarshal([]byte(v), pO)
 				if err != nil {
 					logger.Error("error unmarshalling from cache")
@@ -327,7 +327,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 
 				payment, err := o.paymentsAPI.GetPayment(payments.GetPaymentRequest{PaymentID: pUID})
 				if err != nil {
-					logger.Error("error getting payment status")
+					logger.Error(fmt.Sprintf("%s: %s", "failed getting payment status", err.Error()))
 					continue
 				}
 
@@ -346,5 +346,3 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 		}
 	}
 }
-
-// TODO HANDLE CONSUMED PRODUCITON MSG AND UPDATE ORDER STATUS

@@ -71,7 +71,7 @@ func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err e
 		return nil, ErrBadRouting
 	}
 
-	return endpoint.DeleteOrderRequest{ID: id}, nil
+	return endpoint.CheckoutOrderRequest{ID: id}, nil
 }
 
 func decodeDeleteOrder(_ context.Context, r *http.Request) (request any, err error) {
