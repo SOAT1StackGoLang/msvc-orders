@@ -10,6 +10,8 @@ github.com/SOAT1StackGoLang/msvc-payments v1.1.2 h1:+mS25YzJ7s3Fq0ZP4S2e5QM6c4Lz
 github.com/SOAT1StackGoLang/msvc-payments v1.1.2/go.mod h1:i7dtNz9tGJz3yDMGOE0odftqwTMvQClJ4fhtS5US9v0=
 github.com/SOAT1StackGoLang/msvc-production v1.0.1 h1:rjIvzrFxY6FLqY5cgHtwzOvdhHF/vEniPdVYlnbBEFY=
 github.com/SOAT1StackGoLang/msvc-production v1.0.1/go.mod h1:LNuUde5SJxhMSGle9Z/A0KSnAqX3B43GB0Eqv4tmTac=
+github.com/SOAT1StackGoLang/msvc-production v1.0.2 h1:CQIljWATyhP15HwkBmB/J+KzfWgnAWHEoeppXq4XT1Q=
+github.com/SOAT1StackGoLang/msvc-production v1.0.2/go.mod h1:LNuUde5SJxhMSGle9Z/A0KSnAqX3B43GB0Eqv4tmTac=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=

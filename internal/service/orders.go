@@ -9,6 +9,7 @@ import (
 	payments "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
+	productionpkg "github.com/SOAT1StackGoLang/msvc-production/pkg"
 	production "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
@@ -58,13 +59,63 @@ func NewOrdersService(
 	log kitlog.Logger,
 	cache datastore.RedisStore,
 ) OrdersService {
-	return &ordersSvc{
+	svc := &ordersSvc{
 		cache:       cache,
 		ordersRepo:  repo,
 		productsSvc: prodSvc,
 		paymentsSvc: paySvc,
 		log:         log,
 	}
+
+	go svc.subscribeToProductionSvc()
+
+	return svc
+}
+
+func (o *ordersSvc) subscribeToProductionSvc() {
+	ctx := context.Background()
+	sub, err := o.cache.Subscribe(ctx, productionpkg.OrderStatusChannel)
+	if err != nil {
+		o.log.Log(
+			"error subscribing to order status updates",
+			zap.Error(err),
+		)
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-sub:
+			o.handleProductionMessage(msg.Payload)
+		}
+	}
+}
+
+func (o *ordersSvc) handleProductionMessage(message string) {
+	var in models.OrderProductionNotification
+	err := json.Unmarshal([]byte(message), &in)
+	if err != nil {
+		o.log.Log(
+			"error unmarshalling order status update",
+			zap.Error(err),
+		)
+		return
+	}
+
+	_, err = o.UpdateOrderStatus(context.Background(), in.ID, in.Status)
+	if err != nil {
+		return
+	}
+
+	o.log.Log("Order Status updated",
+		zap.String("status", string(in.Status)),
+		zap.Any("order_id", in.ID),
+		zap.Time("updated_at", in.UpdatedAt),
+	)
+
+	return
 }
 
 func (o *ordersSvc) GetOrder(ctx context.Context, id uuid.UUID) (*models.Order, error) {
