@@ -18,6 +18,12 @@ type Order struct {
 	Products  []Product
 }
 
+type OrderProductionNotification struct {
+	ID        uuid.UUID   `json:"id"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	Status    OrderStatus `json:"status"`
+}
+
 type OrderStatus string
 
 const (

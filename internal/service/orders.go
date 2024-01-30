@@ -3,12 +3,14 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
 	payments "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
+	productionpkg "github.com/SOAT1StackGoLang/msvc-production/pkg"
 	production "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
@@ -57,14 +59,66 @@ func NewOrdersService(
 	paySvc PaymentsService,
 	log kitlog.Logger,
 	cache datastore.RedisStore,
+	paymentAPI payments.PaymentAPI,
+	productionAPI production.ProductionAPI,
 ) OrdersService {
-	return &ordersSvc{
-		cache:       cache,
-		ordersRepo:  repo,
-		productsSvc: prodSvc,
-		paymentsSvc: paySvc,
-		log:         log,
+	svc := &ordersSvc{
+		cache:         cache,
+		ordersRepo:    repo,
+		productsSvc:   prodSvc,
+		paymentsSvc:   paySvc,
+		log:           log,
+		paymentsAPI:   paymentAPI,
+		productionAPI: productionAPI,
 	}
+
+	go svc.ProcessPayment()
+	go svc.subscribeToProductionSvc()
+
+	return svc
+}
+
+func (o *ordersSvc) subscribeToProductionSvc() {
+	ctx := context.Background()
+	sub, err := o.cache.Subscribe(ctx, productionpkg.OrderStatusChannel)
+	if err != nil {
+		logger.Info("error subscribing to order status updates")
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-sub:
+			o.handleProductionMessage(msg.Payload)
+		}
+	}
+}
+
+func (o *ordersSvc) handleProductionMessage(message string) {
+	var in models.OrderProductionNotification
+	err := json.Unmarshal([]byte(message), &in)
+	if err != nil {
+		o.log.Log(
+			"error unmarshalling order status update",
+			zap.Error(err),
+		)
+		return
+	}
+
+	_, err = o.UpdateOrderStatus(context.Background(), in.ID, in.Status)
+	if err != nil {
+		return
+	}
+
+	o.log.Log("Order Status updated",
+		zap.String("status", string(in.Status)),
+		zap.Any("order_id", in.ID),
+		zap.Time("updated_at", in.UpdatedAt),
+	)
+
+	return
 }
 
 func (o *ordersSvc) GetOrder(ctx context.Context, id uuid.UUID) (*models.Order, error) {
@@ -106,10 +160,7 @@ func (o *ordersSvc) CreateOrder(ctx context.Context, products []models.Product, 
 		Status:    models.ORDER_STATUS_OPEN,
 		Products:  products,
 	}
-
-	if userID != uuid.Nil {
-		order.UserID = userID
-	}
+	order.UserID = userID
 
 	for _, v := range products {
 		order.Price = order.Price.Add(v.Price)
@@ -220,7 +271,7 @@ func (o *ordersSvc) ProcessPayment() {
 			logger.Info(zap.String("payment_id", paid.PaymentID).String)
 			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
 			if err != nil {
-				logger.Error("failed updating payment status")
+				logger.Error(fmt.Sprintf("%s: %s", "failed updating payment status", err.Error()))
 				continue
 			}
 
@@ -229,7 +280,7 @@ func (o *ordersSvc) ProcessPayment() {
 				Status:  production.ORDER_STATUS_PREPARING,
 			})
 			if err != nil {
-				logger.Error("failed sending to production")
+				logger.Error(fmt.Sprintf("%s: %s", "failed sending order to production", err.Error()))
 				continue
 			}
 
@@ -261,7 +312,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 			}
 
 			for _, v := range registers {
-				var pO *pendingOrders
+				pO := &pendingOrders{}
 				err = json.Unmarshal([]byte(v), pO)
 				if err != nil {
 					logger.Error("error unmarshalling from cache")
@@ -276,7 +327,7 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 
 				payment, err := o.paymentsAPI.GetPayment(payments.GetPaymentRequest{PaymentID: pUID})
 				if err != nil {
-					logger.Error("error getting payment status")
+					logger.Error(fmt.Sprintf("%s: %s", "failed getting payment status", err.Error()))
 					continue
 				}
 
@@ -295,5 +346,3 @@ func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
 		}
 	}
 }
-
-// TODO HANDLE CONSUMED PRODUCITON MSG AND UPDATE ORDER STATUS
