@@ -6,7 +6,6 @@ import (
 	"errors"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/endpoint"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
-	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	kittransport "github.com/go-kit/kit/transport"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -110,7 +109,6 @@ func decodeInsertCategoriesRequest(_ context.Context, r *http.Request) (request 
 }
 
 func decodeGetCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
-	logger.Info("decodeGetCategoriesRequest")
 	vars := mux.Vars(r)
 
 	id, ok := vars["id"]
