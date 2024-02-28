@@ -2,7 +2,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
@@ -13,14 +15,27 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
 )
+
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
 
 func main() {
 	cache, err := initializeApp()
 	if err != nil {
-		panic(fmt.Sprintf("unable to connect "))
+		panic("unable to connect")
 	}
 
 	gormDB, err := gorm.Open(postgres.Open(connString), &gorm.Config{

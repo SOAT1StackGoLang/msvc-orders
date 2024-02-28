@@ -24,6 +24,8 @@ deps:
     RUN go mod download
     #RUN go get -u github.com/swaggo/swag/cmd/swag
     #RUN go install github.com/swaggo/swag/cmd/swag
+    #RUN swag init -g ../../../cmd/server/main.go -o ./docs/ -d internal/transport/routes/
+
     #RUN swag init -g ../../cmd/web/routes.go -o ./docs -d ./internal/handlers
 
 compile:
