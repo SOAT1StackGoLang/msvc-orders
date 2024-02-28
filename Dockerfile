@@ -20,6 +20,9 @@ WORKDIR /go/src/app
 ADD ./ .
 RUN ls -alth
 RUN go get -d -v ./...
+RUN go get -u github.com/swaggo/swag/cmd/swag
+RUN go install github.com/swaggo/swag/cmd/swag
+RUN swag init -g ../../../cmd/server/main.go -o ./docs/ -d internal/transport/routes/
 RUN go build -o /go/bin/app -v cmd/server/*.go
 RUN go build -o /go/bin/migs -v cmd/migrations/*.go
 
