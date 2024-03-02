@@ -1,0 +1,2 @@
+insert into public.lanchonete_products (id,created_at, category_id, name, description, price)
+values ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', now(), 'a557b0c0-3bcf-11ee-be56-0242ac120002', 'Coca-Cola 600ml', 'Refreshing Coca-Cola 600ml', 3.50);
