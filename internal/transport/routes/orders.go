@@ -69,6 +69,8 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("swagger-ui"),
 	))
+	// redirect / to /swagger/index.html
+	r.Methods(http.MethodGet).Path("/").Handler(http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 
 	return r
 }
