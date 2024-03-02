@@ -104,6 +104,7 @@ func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err e
 //	@Tags		orders
 //	@Accept		json
 //	@Produce	json
+//	@Param		id	path		string	true	"Order ID"
 //	@Success	200	{string}	string	"ok"
 //	@Failure	400	{string}	string	"error"
 //	@Failure	404	{string}	string	"error"
@@ -149,9 +150,10 @@ func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err
 //	@Tags		orders
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{string}	string	"ok"
-//	@Failure	400	{string}	string	"error"
-//	@Failure	500	{string}	string	"error"
+//	@Param		request	body	string	true  "Order request data" SchemaExample({\r\n "user_id": "123e4567-e89b-12d3-a456-426614174000",\r\n "products_ids": ["98c1d1db-4f46-4ce7-989f-e1de2fba8068", "98c1d1db-4f46-4ce7-989f-e1de2fba8068"]\r\n})
+//	@Success	200		{string}	string	"ok"
+//	@Failure	400		{string}	string	"error"
+//	@Failure	500		{string}	string	"error"
 //	@Router		/order [post]
 func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.CreateOrderRequest
@@ -193,9 +195,11 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 //	@Tags		orders
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{string}	string	"ok"
-//	@Failure	400	{string}	string	"error"
-//	@Failure	500	{string}	string	"error"
+//	@Param		limit	query		int		true	"Limit"
+//	@Param		offset	query		int		true	"Offset"
+//	@Success	200		{string}	string	"ok"
+//	@Failure	400		{string}	string	"error"
+//	@Failure	500		{string}	string	"error"
 //	@Router		/order/all [get]
 func decodeListOrdersRequest(_ context.Context, r *http.Request) (request any, err error) {
 	query := r.URL.Query()

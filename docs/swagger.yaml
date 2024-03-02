@@ -20,6 +20,15 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: Order request data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n \"user_id\": \"123e4567-e89b-12d3-a456-426614174000\",\r\n
+            \"products_ids\": [\"98c1d1db-4f46-4ce7-989f-e1de2fba8068\", \"98c1d1db-4f46-4ce7-989f-e1de2fba8068\"]\r\n}"
+          type: string
       produces:
       - application/json
       responses:
@@ -42,6 +51,12 @@ paths:
     delete:
       consumes:
       - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -93,6 +108,17 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -169,6 +195,76 @@ paths:
       summary: Update order items
       tags:
       - orders
+  /product:
+    post:
+      consumes:
+      - application/json
+      description: Insert a product
+      operationId: insert-product
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Coca-Cola 2L\",\r\n  \"description\": \"Refrigerante
+            Coca-Cola 2L\",\r\n  \"category_id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n
+            \ \"price\": \"10.00\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Insert a product
+      tags:
+      - Products
+  /product/{id}:
+    get:
+      description: Get a product by ID
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Get a product by ID
+      tags:
+      - Products
 securityDefinitions:
   BasicAuth:
     type: basic
