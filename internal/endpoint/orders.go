@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/go-kit/kit/endpoint"
@@ -32,6 +33,12 @@ func MakeOrdersEndpoint(svc service.OrdersService) OrdersEndpoint {
 	}
 }
 
+// ShowAccount godoc
+// @Summary      Show an account
+// @Description  get string by ID
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
 func makeListOrdersEndpoint(svc service.OrdersService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(ListOrderRequest)

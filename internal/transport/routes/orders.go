@@ -17,6 +17,19 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// ShowAccount godoc
+// @Summary      Show an account
+// @Description  get string by ID
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Account ID"
+// @Success      200  {object}  model.Account
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /accounts/{id} [get]
+
 func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Logger) *mux.Router {
 	ordersEnpoints := endpoint.MakeOrdersEndpoint(svc)
 
@@ -31,12 +44,14 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 		encodeResponse,
 		options...,
 	))
+
 	r.Methods(http.MethodGet).Path("/order/{id}").Handler(httptransport.NewServer(
 		ordersEnpoints.GetOrderEndpoint,
 		decodeGetOrderRequest,
 		encodeResponse,
 		options...,
 	))
+
 	r.Methods(http.MethodPost).Path("/order").Handler(httptransport.NewServer(
 		ordersEnpoints.CreateOrderEndpoint,
 		decodeCreateOrderRequest,
@@ -61,7 +76,7 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 		encodeResponse,
 		options...,
 	))
-	r.Methods(http.MethodGet).PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+	r.Methods(http.MethodGet).PathPrefix("/swagger").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), // URL pointing to the API definition
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),

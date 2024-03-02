@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/endpoint"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	kittransport "github.com/go-kit/kit/transport"
 	"github.com/gorilla/mux"
-	"net/http"
-	"strconv"
 
 	kitlog "github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -29,6 +30,14 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
+	// swagger:route GET /admin/company/ admin listCompany
+	// Get companies list
+	//
+	// security:
+	// - apiKey: []
+	// responses:
+	//  401: CommonError
+	//  200: GetCompanies
 	r.Methods(http.MethodGet).Path("/category/all").Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").Handler(httptransport.NewServer(
 		catEndpoints.ListCategoriesEndpoint,
 		decodeListCategoriesRequest,
