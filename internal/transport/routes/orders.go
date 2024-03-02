@@ -17,19 +17,6 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// ShowAccount godoc
-// @Summary      Show an account
-// @Description  get string by ID
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "Account ID"
-// @Success      200  {object}  model.Account
-// @Failure      400  {object}  httputil.HTTPError
-// @Failure      404  {object}  httputil.HTTPError
-// @Failure      500  {object}  httputil.HTTPError
-// @Router       /accounts/{id} [get]
-
 func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Logger) *mux.Router {
 	ordersEnpoints := endpoint.MakeOrdersEndpoint(svc)
 
@@ -86,6 +73,18 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 	return r
 }
 
+// OrderCheckout godoc
+//
+//	@Summary	Checkout an order
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		string	true	"Order ID"
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	404	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/checkout/{id} [get]
 func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -97,6 +96,17 @@ func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err e
 	return endpoint.CheckoutOrderRequest{ID: id}, nil
 }
 
+// DeleteOrder godoc
+//
+//	@Summary	Delete an order
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	404	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/{id} [delete]
 func decodeDeleteOrder(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -108,6 +118,17 @@ func decodeDeleteOrder(_ context.Context, r *http.Request) (request any, err err
 	return endpoint.DeleteOrderRequest{ID: id}, nil
 }
 
+// UpdateOrderItems godoc
+//
+//	@Summary	Update order items
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	404	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/items [put]
 func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.UpdateOrderRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
@@ -120,6 +141,16 @@ func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err
 	}, nil
 }
 
+// CreateOrder godoc
+//
+//	@Summary	Create an order
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order [post]
 func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.CreateOrderRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
@@ -132,6 +163,17 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 	}, nil
 }
 
+// GetOrder godoc
+//
+//	@Summary	Get an order
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	404	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/{id} [get]
 func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -143,6 +185,16 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 	return endpoint.GetOrderRequest{ID: id}, nil
 }
 
+// ListOrders godoc
+//
+//	@Summary	List all orders
+//	@Tags		orders
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/all [get]
 func decodeListOrdersRequest(_ context.Context, r *http.Request) (request any, err error) {
 	query := r.URL.Query()
 	limit := query.Get("limit")

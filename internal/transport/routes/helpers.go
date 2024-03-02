@@ -1,22 +1,22 @@
-// @title           Swagger Example API ROUTER Helpers
-// @version         1.0
-// @description     This is a sample server celler server.
-// @termsOfService  http://swagger.io/terms/
+//	@title			Swagger Example API ROUTER Helpers
+//	@version		1.0
+//	@description	This is a sample server celler server.
+//	@termsOfService	http://swagger.io/terms/
 
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
+//	@contact.name	API Support
+//	@contact.url	http://www.swagger.io/support
+//	@contact.email	support@swagger.io
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:8080
-// @BasePath  /api/v1
+//	@host		localhost:8080
+//	@BasePath	/
 
-// @securityDefinitions.basic  BasicAuth
+//	@securityDefinitions.basic	BasicAuth
 
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
+//	@externalDocs.description	OpenAPI
+//	@externalDocs.url			https://swagger.io/resources/open-api/
 package routes
 
 import (
@@ -64,3 +64,16 @@ func codeFrom(err error) int {
 		return http.StatusInternalServerError
 	}
 }
+
+// PingExample godoc2
+//
+//	@Summary		ping example
+//	@Description	do ping
+//	@Tags			example
+//	@Accept			json
+//	@Produce		plain
+//	@Success		200	{string}	string	"pong"
+//	@Failure		400	{string}	string	"ok"
+//	@Failure		404	{string}	string	"ok"
+//	@Failure		500	{string}	string	"ok"
+//	@Router			/examples/ping [get]
