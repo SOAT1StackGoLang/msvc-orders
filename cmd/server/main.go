@@ -2,7 +2,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
@@ -13,14 +15,12 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"net/http"
 )
 
 func main() {
 	cache, err := initializeApp()
 	if err != nil {
-		panic(fmt.Sprintf("unable to connect "))
+		panic("unable to connect")
 	}
 
 	gormDB, err := gorm.Open(postgres.Open(connString), &gorm.Config{
