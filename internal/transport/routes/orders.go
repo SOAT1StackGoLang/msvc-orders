@@ -78,7 +78,7 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 // OrderCheckout godoc
 //
 //	@Summary	Checkout an order
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		string	true	"Order ID"
@@ -101,7 +101,7 @@ func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err e
 // DeleteOrder godoc
 //
 //	@Summary	Delete an order
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		string	true	"Order ID"
@@ -124,7 +124,7 @@ func decodeDeleteOrder(_ context.Context, r *http.Request) (request any, err err
 // UpdateOrderItems godoc
 //
 //	@Summary	Update order items
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{string}	string	"ok"
@@ -147,7 +147,7 @@ func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err
 // CreateOrder godoc
 //
 //	@Summary	Create an order
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Param		request	body	string	true  "Order request data" SchemaExample({\r\n "user_id": "123e4567-e89b-12d3-a456-426614174000",\r\n "products_ids": ["b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"]\r\n})
@@ -170,7 +170,7 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 // GetOrder godoc
 //
 //	@Summary	Get an order
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{string}	string	"ok"
@@ -192,7 +192,7 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 // ListOrders godoc
 //
 //	@Summary	List all orders
-//	@Tags		orders
+//	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
 //	@Param		limit	query		int		true	"Limit"
