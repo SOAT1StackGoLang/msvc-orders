@@ -3,13 +3,14 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/endpoint"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	kittransport "github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
 	kitlog "github.com/go-kit/log"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog.Logger) *mux.Router {
@@ -35,7 +36,7 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 		encodeResponse,
 		options...))
 	r.Methods(http.MethodDelete).Path("/product/{id}").Handler(httptransport.NewServer(prodEndpoints.DeleteProductEndpoint,
-		decodeDeleteCategoriesRequest,
+		decodeDeleteProductsRequest,
 		encodeResponse,
 		options...,
 	))
@@ -43,6 +44,19 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 	return r
 }
 
+// GetProduct
+//
+//	@Summary		Get a product by ID
+//	@Tags			Products
+//	@Description	Get a product by ID
+//	@ID				get-product
+//	@Produce		json
+//	@Param			id	path		string	true	"Product ID"
+//	@Success		200	{string}	string	"ok"
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"Not Found"
+//	@Failure		500	{string}	string	"Inernal Server Error"
+//	@Router			/product/{id} [get]
 func decodeGetProductsRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -54,6 +68,20 @@ func decodeGetProductsRequest(_ context.Context, r *http.Request) (request any, 
 	return endpoint.GetProductRequest{ID: id}, nil
 }
 
+// InsertProduct
+//
+//	@Summary		Insert a product
+//	@Tags			Products
+//	@Description	Insert a product
+//	@ID				insert-product
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		string	true	"Product data"	SchemaExample({\r\n  "name": "Coca-Cola 2L",\r\n  "description": "Refrigerante Coca-Cola 2L",\r\n  "category_id": "a557b0c0-3bcf-11ee-be56-0242ac120002",\r\n  "price": "10.00"\r\n})
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"error"
+//	@Failure		404		{string}	string	"Not Found"
+//	@Failure		500		{string}	string	"Inernal Server Error"
+//	@Router			/product [post]
 func decodeInsertProductsRequest(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.InsertProductRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
@@ -67,6 +95,21 @@ func decodeInsertProductsRequest(_ context.Context, r *http.Request) (request an
 		Price:       req.Price,
 	}, nil
 }
+
+// UpdateProduct
+//
+//	@Summary		Update a product
+//	@Tags			Products
+//	@Description	Update a product
+//	@ID				update-product
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		string	true	"Product data"	SchemaExample({\r\n  "id": "a557b0c0-3bcf-11ee-be56-0242ac120002",\r\n  "name": "Coca-Cola 2L",\r\n  "description": "Refrigerante Coca-Cola 2L",\r\n  "category_id": "a557b0c0-3bcf-11ee-be56-0242ac120002",\r\n  "price": "10.00"\r\n})
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"error"
+//	@Failure		404		{string}	string	"Not Found"
+//	@Failure		500		{string}	string	"Inernal Server Error"
+//	@Router			/product [put]
 func decodeUpdateProductsRequest(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.UpdateProductRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
@@ -81,6 +124,21 @@ func decodeUpdateProductsRequest(_ context.Context, r *http.Request) (request an
 		Price:       req.Price,
 	}, nil
 }
+
+// DeleteProduct
+//
+//	@Summary		Delete a product
+//	@Tags			Products
+//	@Description	Delete a product
+//	@ID				delete-product
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"Product ID"
+//	@Success		200	{string}	string	"ok"
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"Not Found"
+//	@Failure		500	{string}	string	"Inernal Server Error"
+//	@Router			/product/{id} [delete]
 func decodeDeleteProductsRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 

@@ -16,10 +16,155 @@ info:
   title: Swagger Example API ROUTER Helpers
   version: "1.0"
 paths:
+  /category:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category
+      operationId: delete-category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Delete a category
+      tags:
+      - Categories
+    post:
+      consumes:
+      - application/json
+      description: Insert a category
+      operationId: insert-category
+      parameters:
+      - description: Category data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Bebidas\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Insert a category
+      tags:
+      - Categories
+  /category/{id}:
+    get:
+      description: Get a category by ID
+      operationId: get-category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Get a category by ID
+      tags:
+      - Categories
+  /category/all:
+    get:
+      description: List all categories
+      operationId: list-categories
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: List all categories
+      tags:
+      - Categories
   /order:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: Order request data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n \"user_id\": \"123e4567-e89b-12d3-a456-426614174000\",\r\n
+            \"products_ids\": [\"b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12\", \"b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12\"]\r\n}"
+          type: string
       produces:
       - application/json
       responses:
@@ -37,11 +182,17 @@ paths:
             type: string
       summary: Create an order
       tags:
-      - orders
+      - Orders
   /order/{id}:
     delete:
       consumes:
       - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -63,7 +214,7 @@ paths:
             type: string
       summary: Delete an order
       tags:
-      - orders
+      - Orders
     get:
       consumes:
       - application/json
@@ -88,11 +239,22 @@ paths:
             type: string
       summary: Get an order
       tags:
-      - orders
+      - Orders
   /order/all:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -110,7 +272,7 @@ paths:
             type: string
       summary: List all orders
       tags:
-      - orders
+      - Orders
   /order/checkout/{id}:
     get:
       consumes:
@@ -142,7 +304,7 @@ paths:
             type: string
       summary: Checkout an order
       tags:
-      - orders
+      - Orders
   /order/items:
     put:
       consumes:
@@ -168,7 +330,180 @@ paths:
             type: string
       summary: Update order items
       tags:
-      - orders
+      - Orders
+  /payment/{id}:
+    get:
+      description: Get a payment by ID
+      operationId: get-payment
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Get a payment by ID
+      tags:
+      - Payments
+  /product:
+    post:
+      consumes:
+      - application/json
+      description: Insert a product
+      operationId: insert-product
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Coca-Cola 2L\",\r\n  \"description\": \"Refrigerante
+            Coca-Cola 2L\",\r\n  \"category_id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n
+            \ \"price\": \"10.00\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Insert a product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update a product
+      operationId: update-product
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n  \"name\":
+            \"Coca-Cola 2L\",\r\n  \"description\": \"Refrigerante Coca-Cola 2L\",\r\n
+            \ \"category_id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n  \"price\":
+            \"10.00\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Update a product
+      tags:
+      - Products
+  /product/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product
+      operationId: delete-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Delete a product
+      tags:
+      - Products
+    get:
+      description: Get a product by ID
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Get a product by ID
+      tags:
+      - Products
 securityDefinitions:
   BasicAuth:
     type: basic

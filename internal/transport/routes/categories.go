@@ -61,6 +61,20 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 	return r
 }
 
+// ListCategories
+//
+//	@Summary		List all categories
+//	@Tags			Categories
+//	@Description	List all categories
+//	@ID				list-categories
+//	@Produce		json
+//	@Param			limit	query		int		true	"Limit"
+//	@Param			offset	query		int		true	"Offset"
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"error"
+//	@Failure		404		{string}	string	"Not Found"
+//	@Failure		500		{string}	string	"Inernal Server Error"
+//	@Router			/category/all [get]
 func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	query := r.URL.Query()
 	limit := query.Get("limit")
@@ -87,6 +101,19 @@ func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request an
 
 }
 
+// DeleteCategories
+//
+//	@Summary		Delete a category
+//	@Tags			Categories
+//	@Description	Delete a category
+//	@ID				delete-category
+//	@Accept			json
+//	@Param			id	path		string	true	"Category ID"
+//	@Success		200	{string}	string	"ok"
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"Not Found"
+//	@Failure		500	{string}	string	"Inernal Server Error"
+//	@Router			/category [delete]
 func decodeDeleteCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -98,6 +125,20 @@ func decodeDeleteCategoriesRequest(_ context.Context, r *http.Request) (request 
 	return endpoint.DeleteCategoryRequest{ID: id}, nil
 }
 
+// InsertCategories
+//
+//	@Summary		Insert a category
+//	@Tags			Categories
+//	@Description	Insert a category
+//	@ID				insert-category
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		string	true	"Category data"	SchemaExample({\r\n  "name": "Bebidas"\r\n})
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"error"
+//	@Failure		404		{string}	string	"Not Found"
+//	@Failure		500		{string}	string	"Inernal Server Error"
+//	@Router			/category [post]
 func decodeInsertCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	var req endpoint.InsertCategoryRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
@@ -109,6 +150,19 @@ func decodeInsertCategoriesRequest(_ context.Context, r *http.Request) (request 
 	}, nil
 }
 
+// GetCategory
+//
+//	@Summary		Get a category by ID
+//	@Tags			Categories
+//	@Description	Get a category by ID
+//	@ID				get-category
+//	@Produce		json
+//	@Param			id	path		string	true	"Category ID"
+//	@Success		200	{string}	string	"ok"
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"Not Found"
+//	@Failure		500	{string}	string	"Inernal Server Error"
+//	@Router			/category/{id} [get]
 func decodeGetCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
