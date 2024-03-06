@@ -220,6 +220,12 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -247,12 +253,14 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Limit
+      - default: 10
+        description: Limit
         in: query
         name: limit
         required: true
         type: integer
-      - description: Offset
+      - default: 0
+        description: Offset
         in: query
         name: offset
         required: true

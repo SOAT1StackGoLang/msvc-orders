@@ -284,6 +284,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "default": 10,
                         "description": "Limit",
                         "name": "limit",
                         "in": "query",
@@ -291,6 +292,7 @@
                     },
                     {
                         "type": "integer",
+                        "default": 0,
                         "description": "Offset",
                         "name": "offset",
                         "in": "query",
@@ -420,6 +422,15 @@
                     "Orders"
                 ],
                 "summary": "Get an order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "ok",
