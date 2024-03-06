@@ -46,54 +46,8 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "example": "{\r\n  \"name\": \"Bebidas\"\r\n}"
+                            "example": "{\r\n  \"name\": \"Bebidas Importadas\"\r\n}"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Inernal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a category",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Categories"
-                ],
-                "summary": "Delete a category",
-                "operationId": "delete-category",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Category ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -138,6 +92,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "default": 10,
                         "description": "Limit",
                         "name": "limit",
                         "in": "query",
@@ -145,6 +100,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "default": 0,
                         "description": "Offset",
                         "name": "offset",
                         "in": "query",
@@ -190,6 +146,52 @@ const docTemplate = `{
                 ],
                 "summary": "Get a category by ID",
                 "operationId": "get-category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Inernal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a category",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete a category",
+                "operationId": "delete-category",
                 "parameters": [
                     {
                         "type": "string",
