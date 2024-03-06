@@ -17,6 +17,42 @@ info:
   version: "1.0"
 paths:
   /category:
+    post:
+      consumes:
+      - application/json
+      description: Insert a category
+      operationId: insert-category
+      parameters:
+      - description: Category data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Bebidas Importadas\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      summary: Insert a category
+      tags:
+      - Categories
+  /category/{id}:
     delete:
       consumes:
       - application/json
@@ -48,42 +84,6 @@ paths:
       summary: Delete a category
       tags:
       - Categories
-    post:
-      consumes:
-      - application/json
-      description: Insert a category
-      operationId: insert-category
-      parameters:
-      - description: Category data
-        in: body
-        name: request
-        required: true
-        schema:
-          example: "{\r\n  \"name\": \"Bebidas\"\r\n}"
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "400":
-          description: error
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            type: string
-        "500":
-          description: Inernal Server Error
-          schema:
-            type: string
-      summary: Insert a category
-      tags:
-      - Categories
-  /category/{id}:
     get:
       description: Get a category by ID
       operationId: get-category
@@ -120,12 +120,14 @@ paths:
       description: List all categories
       operationId: list-categories
       parameters:
-      - description: Limit
+      - default: 10
+        description: Limit
         in: query
         name: limit
         required: true
         type: integer
-      - description: Offset
+      - default: 0
+        description: Offset
         in: query
         name: offset
         required: true
@@ -218,6 +220,12 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -245,12 +253,14 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Limit
+      - default: 10
+        description: Limit
         in: query
         name: limit
         required: true
         type: integer
-      - description: Offset
+      - default: 0
+        description: Offset
         in: query
         name: offset
         required: true

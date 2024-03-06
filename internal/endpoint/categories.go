@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
@@ -60,7 +61,7 @@ func makeListCategoriesEndpoint(svc service.CategoriesService) endpoint.Endpoint
 func makeDeleteCategoryEndpoint(svc service.CategoriesService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		var out DeleteCategoryResponse
-		req := request.(InsertCategoryResponse)
+		req := request.(DeleteCategoryRequest)
 
 		id, err := uuid.Parse(req.ID)
 		if err != nil {
