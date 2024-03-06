@@ -169,15 +169,16 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 
 // GetOrder godoc
 //
-//	@Summary	Get an order
-//	@Tags		Orders
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{string}	string	"ok"
-//	@Failure	400	{string}	string	"error"
-//	@Failure	404	{string}	string	"error"
-//	@Failure	500	{string}	string	"error"
-//	@Router		/order/{id} [get]
+//		@Summary	Get an order
+//		@Tags		Orders
+//		@Accept		json
+//		@Produce	json
+//	 @Param		id	path		string	true	"Order ID"
+//		@Success	200	{string}	string	"ok"
+//		@Failure	400	{string}	string	"error"
+//		@Failure	404	{string}	string	"error"
+//		@Failure	500	{string}	string	"error"
+//		@Router		/order/{id} [get]
 func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -195,8 +196,8 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 //	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
-//	@Param		limit	query		int		true	"Limit"
-//	@Param		offset	query		int		true	"Offset"
+//	@Param		limit	query		int		true	"Limit" default(10)
+//	@Param		offset	query		int		true	"Offset" default(0)
 //	@Success	200		{string}	string	"ok"
 //	@Failure	400		{string}	string	"error"
 //	@Failure	500		{string}	string	"error"
