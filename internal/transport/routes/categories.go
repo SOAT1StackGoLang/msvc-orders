@@ -68,8 +68,8 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 //	@Description	List all categories
 //	@ID				list-categories
 //	@Produce		json
-//	@Param			limit	query		int		true	"Limit" default(10)
-//	@Param			offset	query		int		true	"Offset" default(0)
+//	@Param			limit	query		int		true	"Limit"		default(10)
+//	@Param			offset	query		int		true	"Offset"	default(0)
 //	@Success		200		{string}	string	"ok"
 //	@Failure		400		{string}	string	"error"
 //	@Failure		404		{string}	string	"Not Found"
@@ -103,17 +103,17 @@ func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request an
 
 // DeleteCategories
 //
-//		@Summary		Delete a category
-//		@Tags			Categories
-//		@Description	Delete a category
-//		@ID				delete-category
-//		@Accept			json
-//	 @Param			id	path		string	true	"Category ID"
-//		@Success		200	{string}	string	"ok"
-//		@Failure		400	{string}	string	"error"
-//		@Failure		404	{string}	string	"Not Found"
-//		@Failure		500	{string}	string	"Inernal Server Error"
-//		@Router			/category/{id} [delete]
+//	@Summary		Delete a category
+//	@Tags			Categories
+//	@Description	Delete a category
+//	@ID				delete-category
+//	@Accept			json
+//	@Param			id	path		string	true	"Category ID"
+//	@Success		200	{string}	string	"ok"
+//	@Failure		400	{string}	string	"error"
+//	@Failure		404	{string}	string	"Not Found"
+//	@Failure		500	{string}	string	"Inernal Server Error"
+//	@Router			/category/{id} [delete]
 func decodeDeleteCategoriesRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
