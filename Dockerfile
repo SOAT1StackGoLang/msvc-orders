@@ -23,7 +23,8 @@ RUN go get -d -v ./...
 ## Run Swag
 RUN go get -u github.com/swaggo/swag/cmd/swag
 RUN go install github.com/swaggo/swag/cmd/swag
-RUN swag init -g helpers.go -o ../../../docs/ -d ./internal/transport/routes
+RUN swag init -g helpers.go -o ./docs/ -d ./internal/transport/routes -ot go
+# Build the application
 RUN go build -o /go/bin/app -v cmd/server/*.go
 #RUN ls -alth cmd/migrations/files
 RUN go build -o /go/bin/migs -v cmd/migrations/*.go

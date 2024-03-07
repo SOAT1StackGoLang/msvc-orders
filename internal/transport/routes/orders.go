@@ -150,7 +150,7 @@ func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err
 //	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
-//	@Param		request	body	string	true  "Order request data" SchemaExample({\r\n "user_id": "123e4567-e89b-12d3-a456-426614174000",\r\n "products_ids": ["b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"]\r\n})
+//	@Param		request	body		string	true	"Order request data"	SchemaExample({\r\n "user_id": "123e4567-e89b-12d3-a456-426614174000",\r\n "products_ids": ["b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"]\r\n})
 //	@Success	200		{string}	string	"ok"
 //	@Failure	400		{string}	string	"error"
 //	@Failure	500		{string}	string	"error"
@@ -169,16 +169,16 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 
 // GetOrder godoc
 //
-//		@Summary	Get an order
-//		@Tags		Orders
-//		@Accept		json
-//		@Produce	json
-//	 @Param		id	path		string	true	"Order ID"
-//		@Success	200	{string}	string	"ok"
-//		@Failure	400	{string}	string	"error"
-//		@Failure	404	{string}	string	"error"
-//		@Failure	500	{string}	string	"error"
-//		@Router		/order/{id} [get]
+//	@Summary	Get an order
+//	@Tags		Orders
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		string	true	"Order ID"
+//	@Success	200	{string}	string	"ok"
+//	@Failure	400	{string}	string	"error"
+//	@Failure	404	{string}	string	"error"
+//	@Failure	500	{string}	string	"error"
+//	@Router		/order/{id} [get]
 func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
 	vars := mux.Vars(r)
 
@@ -196,8 +196,8 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 //	@Tags		Orders
 //	@Accept		json
 //	@Produce	json
-//	@Param		limit	query		int		true	"Limit" default(10)
-//	@Param		offset	query		int		true	"Offset" default(0)
+//	@Param		limit	query		int		true	"Limit"		default(10)
+//	@Param		offset	query		int		true	"Offset"	default(0)
 //	@Success	200		{string}	string	"ok"
 //	@Failure	400		{string}	string	"error"
 //	@Failure	500		{string}	string	"error"
