@@ -1,6 +1,6 @@
-//	@title			Swagger Example API ROUTER Helpers
+//	@title			Swagger Tech Challenge Order API
 //	@version		1.0
-//	@description	This is a sample server celler server.
+//	@description	API for managing orders
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	API Support
