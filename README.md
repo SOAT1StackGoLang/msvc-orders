@@ -2,6 +2,14 @@
 
 Microservice Orders
 
+## Owasp Scanning Report
+
+[Owasp Report](./owasp/README.md)
+
+## Swagger Documentation
+
+[Swagger Documentation](./docs/readme.md)
+
 ## Generate Swagger
 
 ```bash
