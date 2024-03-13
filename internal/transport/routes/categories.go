@@ -65,6 +65,7 @@ func NewCategoriesRouter(svc service.CategoriesService, r *mux.Router, logger ki
 //
 //	@Summary		List all categories
 //	@Tags			Categories
+//	@Security		ApiKeyAuth
 //	@Description	List all categories
 //	@ID				list-categories
 //	@Produce		json
@@ -105,6 +106,7 @@ func decodeListCategoriesRequest(_ context.Context, r *http.Request) (request an
 //
 //	@Summary		Delete a category
 //	@Tags			Categories
+//	@Security		ApiKeyAuth
 //	@Description	Delete a category
 //	@ID				delete-category
 //	@Accept			json
@@ -129,6 +131,7 @@ func decodeDeleteCategoriesRequest(_ context.Context, r *http.Request) (request 
 //
 //	@Summary		Insert a category
 //	@Tags			Categories
+//	@Security		ApiKeyAuth
 //	@Description	Insert a category
 //	@ID				insert-category
 //	@Accept			json
@@ -154,6 +157,7 @@ func decodeInsertCategoriesRequest(_ context.Context, r *http.Request) (request 
 //
 //	@Summary		Get a category by ID
 //	@Tags			Categories
+//	@Security		ApiKeyAuth
 //	@Description	Get a category by ID
 //	@ID				get-category
 //	@Produce		json
