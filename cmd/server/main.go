@@ -45,7 +45,7 @@ func main() {
 	paymentsClient := paymentsapi.NewClient(paymentURI, logger.InfoLogger)
 
 	paymentsRepo := persistence.NewPaymentsPersistence(gormDB, logger.InfoLogger)
-	paymentsSvc := service.NewPaymentsService(paymentsRepo, paymentsClient, logger.InfoLogger)
+	paymentsSvc := service.NewPaymentsService(paymentsRepo, paymentsClient, logger.InfoLogger, cache)
 	r = routes.NewPaymentsRouter(paymentsSvc, r, logger.InfoLogger)
 
 	ordersRepo := persistence.NewOrdersPersistence(gormDB, logger.InfoLogger)

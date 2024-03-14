@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	paymentapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
+	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
+	"github.com/SOAT1StackGoLang/msvc-payments/pkg/messages"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
@@ -16,6 +19,7 @@ type paymentsSvc struct {
 	repo   persistence.PaymentRepository
 	client paymentapi.PaymentAPI
 	log    kitlog.Logger
+	redis  datastore.RedisStore
 }
 
 func (p *paymentsSvc) GetPayment(ctx context.Context, paymentID uuid.UUID) (*models.Payment, error) {
@@ -34,17 +38,23 @@ func (p *paymentsSvc) CreatePayment(ctx context.Context, order *models.Order) (*
 
 	receipt, err := p.repo.CreatePayment(ctx, payment)
 
-	_, err = p.client.CreatePayment(paymentapi.CreatePaymentRequest{Payment: paymentapi.Payment{
-		ID:        payment.ID,
-		CreatedAt: payment.CreatedAt,
-		UpdatedAt: payment.UpdatedAt,
-		Price:     payment.Price,
-		OrderID:   payment.OrderID,
-		Status:    paymentapi.PaymentStatusPending,
-	}})
+	outPayment := messages.PaymentCreationRequestMessage{
+		ID:        receipt.ID.String(),
+		CreatedAt: receipt.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: receipt.UpdatedAt.Format(time.RFC3339),
+		Price:     receipt.Price.InexactFloat64(),
+		OrderID:   receipt.OrderID.String(),
+		Status:    string(receipt.Status),
+	}
 
+	bytes, err := json.Marshal(outPayment)
 	if err != nil {
-		logger.Error(fmt.Sprintf("%s: %s", "failed creating payment ", err.Error()))
+		logger.Error(fmt.Sprintf("%s: %s", "failed marshalling payment creation request", err.Error()))
+		return nil, err
+	}
+	err = p.redis.Publish(ctx, messages.OrderPaymentCreationRequestChannel, bytes)
+	if err != nil {
+		return nil, err
 	}
 
 	return receipt, nil
@@ -64,10 +74,11 @@ func (p *paymentsSvc) UpdatePayment(ctx context.Context, paymentID uuid.UUID, st
 	return updated, err
 }
 
-func NewPaymentsService(repo persistence.PaymentRepository, api paymentapi.PaymentAPI, log kitlog.Logger) PaymentsService {
+func NewPaymentsService(repo persistence.PaymentRepository, api paymentapi.PaymentAPI, log kitlog.Logger, cache datastore.RedisStore) PaymentsService {
 	return &paymentsSvc{
 		client: api,
 		repo:   repo,
 		log:    log,
+		redis:  cache,
 	}
 }

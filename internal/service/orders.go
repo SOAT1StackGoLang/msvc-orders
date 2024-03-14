@@ -3,45 +3,21 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
 	payments "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
+	"github.com/SOAT1StackGoLang/msvc-payments/pkg/messages"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
 	productionpkg "github.com/SOAT1StackGoLang/msvc-production/pkg"
 	production "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
+	productionmsgs "github.com/SOAT1StackGoLang/msvc-production/pkg/messages"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
-
-const ordersPendingPayment = "orders_pending_payment"
-const ordersProcessingPayment = "orders_processing_payment"
-const ordersPendingProduction = "orders_pending_production"
-
-type pendingOrders struct {
-	ID        string `json:"id"`
-	PaymentID string `json:"payment_id"`
-}
-
-func MarshalPendingOrders(order models.Order) ([]byte, error) {
-	return json.Marshal(&pendingOrders{
-		ID:        order.ID.String(),
-		PaymentID: order.PaymentID.String(),
-	})
-}
-
-func UnmarshalPendingOrders(marshalled string) (*pendingOrders, error) {
-	var out *pendingOrders
-	err := json.Unmarshal([]byte(marshalled), out)
-	return out, err
-}
 
 type ordersSvc struct {
 	paymentsAPI   payments.PaymentAPI
@@ -72,13 +48,13 @@ func NewOrdersService(
 		productionAPI: productionAPI,
 	}
 
-	go svc.ProcessPayment()
-	go svc.subscribeToProductionSvc()
+	go svc.SubscribeToPaymentUpdates()
+	go svc.SubscribeToProductionUpdates()
 
 	return svc
 }
 
-func (o *ordersSvc) subscribeToProductionSvc() {
+func (o *ordersSvc) SubscribeToProductionUpdates() {
 	ctx := context.Background()
 	sub, err := o.cache.Subscribe(ctx, productionpkg.OrderStatusChannel)
 	if err != nil {
@@ -97,7 +73,7 @@ func (o *ordersSvc) subscribeToProductionSvc() {
 }
 
 func (o *ordersSvc) handleProductionMessage(message string) {
-	var in models.OrderProductionNotification
+	var in productionmsgs.ProductionStatusChangedMessage
 	err := json.Unmarshal([]byte(message), &in)
 	if err != nil {
 		o.log.Log(
@@ -107,15 +83,25 @@ func (o *ordersSvc) handleProductionMessage(message string) {
 		return
 	}
 
-	_, err = o.UpdateOrderStatus(context.Background(), in.ID, in.Status)
+	orderID, err := uuid.Parse(in.OrderID)
+	if err != nil {
+		o.log.Log(
+			"error parsing order id",
+			zap.Error(err),
+		)
+		return
+	}
+
+	status := models.OrderStatus(in.Status)
+	out, err := o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), status)
 	if err != nil {
 		return
 	}
 
 	o.log.Log("Order Status updated",
 		zap.String("status", string(in.Status)),
-		zap.Any("order_id", in.ID),
-		zap.Time("updated_at", in.UpdatedAt),
+		zap.Any("order_id", orderID),
+		zap.Time("updated_at", out.UpdatedAt),
 	)
 
 	return
@@ -224,20 +210,6 @@ func (o *ordersSvc) Checkout(ctx context.Context, id uuid.UUID) (*models.Order, 
 		)
 	}
 
-	orders, err := MarshalPendingOrders(*order)
-	if err != nil {
-		return nil, err
-	}
-
-	err = o.cache.LPush(ctx, ordersPendingPayment, orders)
-	if err != nil {
-		o.log.Log(
-			"failed pushing into "+ordersPendingPayment,
-			zap.Error(err),
-		)
-		return nil, err
-	}
-
 	return order, err
 }
 
@@ -253,96 +225,90 @@ func (o *ordersSvc) UpdateOrderStatus(ctx context.Context, orderID uuid.UUID, st
 	return o.ordersRepo.UpdateOrder(ctx, order)
 }
 
-func (o *ordersSvc) ProcessPayment() {
-	var paidChannel = make(chan *pendingOrders, 1)
-	logger.Info("Starting payment pooling...")
-
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
-
-	go o.processPayments(paidChannel)
-
+func (o *ordersSvc) SubscribeToPaymentUpdates() {
+	ctx := context.Background()
+	sub, err := o.cache.Subscribe(ctx, messages.PaymentStatusResponseChannel)
+	if err != nil {
+		logger.Info("error subscribing to payment status updates")
+		return
+	}
 	for {
 		select {
-		case <-shutdown:
-			logger.Info("Shutting down ProcessPayment...")
+		case <-ctx.Done():
 			return
-		case paid := <-paidChannel:
-			logger.Info(zap.String("payment_id", paid.PaymentID).String)
-			_, err := o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(paid.PaymentID), models.PAYMENT_STATUS_APPROVED)
-			if err != nil {
-				logger.Error(fmt.Sprintf("%s: %s", "failed updating payment status", err.Error()))
-				continue
-			}
-
-			_, err = o.productionAPI.UpdateOrder(production.UpdateOrderRequest{
-				OrderID: paid.ID,
-				Status:  production.ORDER_STATUS_PREPARING,
-			})
-			if err != nil {
-				logger.Error(fmt.Sprintf("%s: %s", "failed sending order to production", err.Error()))
-				continue
-			}
-
-			_, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(paid.ID), models.ORDER_STATUS_PREPARING)
-			if err != nil {
-				logger.Error("failed updating oredr status")
-				continue
-			}
+		case msg := <-sub:
+			o.handlePaymentStatusChangedMessage(msg.Payload)
 		}
 	}
-
 }
 
-func (o *ordersSvc) processPayments(paidChannel chan *pendingOrders) {
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+func (o *ordersSvc) handlePaymentStatusChangedMessage(msg string) {
+	var (
+		in  messages.PaymentStatusChangedMessage
+		err error
+		out *models.Order
+	)
 
-	for {
-		select {
-		case <-shutdown:
-			logger.Info("Shutting down processPayments...")
-			return
-		default:
-			time.Sleep(1 * time.Second)
-			registers, err := o.cache.LRange(context.Background(), ordersPendingPayment, 0, -1)
-			if err != nil {
-				logger.Error("error retrieving from cache")
-				return
-			}
-
-			for _, v := range registers {
-				pO := &pendingOrders{}
-				err = json.Unmarshal([]byte(v), pO)
-				if err != nil {
-					logger.Error("error unmarshalling from cache")
-					continue
-				}
-
-				pUID, err := uuid.Parse(pO.PaymentID)
-				if err != nil {
-					logger.Error("error parsing uuid from cache")
-					continue
-				}
-
-				payment, err := o.paymentsAPI.GetPayment(payments.GetPaymentRequest{PaymentID: pUID})
-				if err != nil {
-					logger.Error(fmt.Sprintf("%s: %s", "failed getting payment status", err.Error()))
-					continue
-				}
-
-				if payment.Payment.Status == payments.PaymentStatusPaid {
-					paidChannel <- &pendingOrders{
-						ID:        payment.Payment.OrderID.String(),
-						PaymentID: payment.Payment.ID.String(),
-					}
-					err = o.cache.LREM(context.Background(), ordersPendingPayment, 1, v)
-					if err != nil {
-						logger.Error("error deleting from cache")
-						return
-					}
-				}
-			}
-		}
+	err = json.Unmarshal([]byte(msg), &in)
+	if err != nil {
+		o.log.Log(
+			"error unmarshalling order status update",
+			zap.Error(err),
+		)
+		return
 	}
+
+	o.log.Log("Received payment status update",
+		zap.String("payment_id", in.ID),
+		zap.String("status", in.Status),
+	)
+	status := models.PaymentStatusFromClearingService(in.Status)
+
+	switch status {
+	case models.PAYMENT_STATUS_APPROVED:
+		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_RECEIVED); err != nil {
+			return
+		}
+		err = o.publishMessage(context.Background(), productionmsgs.OrderSentMessage{
+			OrderID: out.ID.String(),
+			Status:  string(out.Status),
+		}, productionpkg.OrderStatusChannel)
+
+		o.cache.LPush(context.Background(), productionpkg.OrderStatusChannel, []byte("test")
+
+		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_PREPARING); err != nil {
+			return
+		}
+	case models.PAYMENT_SATUS_REFUSED:
+		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_CANCELED); err != nil {
+			return
+		}
+		err = o.publishMessage(context.Background(), productionmsgs.OrderSentMessage{
+			OrderID: out.ID.String(),
+			Status:  string(out.Status),
+		}, productionpkg.OrderStatusChannel)
+	}
+}
+
+func (o *ordersSvc) publishMessage(ctx context.Context, msg any, channel string) error {
+	bytes, err := json.Marshal(msg)
+	if err != nil {
+		o.log.Log(
+			"error marshalling message",
+			zap.Error(err),
+		)
+		return err
+
+	}
+	err = o.cache.Publish(ctx, channel, bytes)
+	if err != nil {
+		o.log.Log(
+			"error publishing message",
+			zap.Any("message", msg),
+			zap.String("channel", channel),
+			zap.Error(err),
+		)
+	}
+
+	return err
 }
