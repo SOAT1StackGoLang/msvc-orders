@@ -4,16 +4,8 @@ github.com/Boostport/migration/driver/postgres v1.1.3 h1:CGIM4X6GaPXN5WntFj7WGIc
 github.com/Boostport/migration/driver/postgres v1.1.3/go.mod h1:nS3juUpTQa7rIDmwvtDMGZeCebphjlzC4aN7fz7phho=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/SOAT1StackGoLang/msvc-payments v1.1.2 h1:+mS25YzJ7s3Fq0ZP4S2e5QM6c4LzyvXfwce8QdglcUI=
-github.com/SOAT1StackGoLang/msvc-payments v1.1.2/go.mod h1:i7dtNz9tGJz3yDMGOE0odftqwTMvQClJ4fhtS5US9v0=
-github.com/SOAT1StackGoLang/msvc-payments v1.1.3 h1:n12NtfdNTq4nOahamW/xfukLMHp6v8iW/okfOfamGfk=
-github.com/SOAT1StackGoLang/msvc-payments v1.1.3/go.mod h1:i7dtNz9tGJz3yDMGOE0odftqwTMvQClJ4fhtS5US9v0=
 github.com/SOAT1StackGoLang/msvc-payments v1.1.4 h1:tHjTnjearekQPN3AD50sSiqvSOW55DruQlJvTsHO9+g=
 github.com/SOAT1StackGoLang/msvc-payments v1.1.4/go.mod h1:i7dtNz9tGJz3yDMGOE0odftqwTMvQClJ4fhtS5US9v0=
-github.com/SOAT1StackGoLang/msvc-production v1.0.2 h1:CQIljWATyhP15HwkBmB/J+KzfWgnAWHEoeppXq4XT1Q=
-github.com/SOAT1StackGoLang/msvc-production v1.0.2/go.mod h1:LNuUde5SJxhMSGle9Z/A0KSnAqX3B43GB0Eqv4tmTac=
-github.com/SOAT1StackGoLang/msvc-production v1.0.3 h1:S/pxLwvOjlbscHtk7hWQRwDoqi8iLNQSLa8KEw97mcg=
-github.com/SOAT1StackGoLang/msvc-production v1.0.3/go.mod h1:b0/SNbtx2DF65fMXMyCh6v3n4KY/HDTpGclhVLmVXTA=
 github.com/SOAT1StackGoLang/msvc-production v1.0.4 h1:VdfFbgYgzgjMTObZgzxB68Lp03diEaG88hu/beCHnkA=
 github.com/SOAT1StackGoLang/msvc-production v1.0.4/go.mod h1:b0/SNbtx2DF65fMXMyCh6v3n4KY/HDTpGclhVLmVXTA=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
@@ -49,8 +41,8 @@ github.com/jackc/pgproto3/v2 v2.3.1 h1:nwj7qwf0S+Q7ISFfBndqeLwSwxs+4DPsbRFjECT1Y
 github.com/jackc/pgproto3/v2 v2.3.1/go.mod h1:WfJCnwN3HIg9Ish/j3sgWXnAfK8A9Y0bwXYU5xKaEdA=
 github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 h1:L0QtFUgDarD7Fpv9jeVMgy/+Ec0mtnmYuImjTz6dtDA=
 github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
-github.com/jackc/pgx/v5 v5.5.2 h1:iLlpgp4Cp/gC9Xuscl7lFL1PhhW+ZLtXZcrfCt4C3tA=
-github.com/jackc/pgx/v5 v5.5.2/go.mod h1:ez9gk+OAat140fv9ErkZDYFWmXLfV+++K0uAOiwgm1A=
+github.com/jackc/pgx/v5 v5.5.4 h1:Xp2aQS8uXButQdnCMWNmvx6UysWQQC+u1EoizjguY+8=
+github.com/jackc/pgx/v5 v5.5.4/go.mod h1:ez9gk+OAat140fv9ErkZDYFWmXLfV+++K0uAOiwgm1A=
 github.com/jackc/puddle/v2 v2.2.1 h1:RhxXJtFG022u4ibrCSMSiu5aOq1i77R3OHKNJj77OAk=
 github.com/jackc/puddle/v2 v2.2.1/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
