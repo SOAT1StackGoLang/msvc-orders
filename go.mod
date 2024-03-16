@@ -6,7 +6,7 @@ require (
 	github.com/Boostport/migration v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/SOAT1StackGoLang/msvc-payments v1.1.6
-	github.com/SOAT1StackGoLang/msvc-production v1.0.4
+	github.com/SOAT1StackGoLang/msvc-production v1.0.5
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/google/uuid v1.6.0
@@ -47,8 +47,4 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.18.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
-
-replace (
-	github.com/SOAT1StackGoLang/msvc-production => ../msvc-production
 )
