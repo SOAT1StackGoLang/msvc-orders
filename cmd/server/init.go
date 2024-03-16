@@ -26,10 +26,10 @@ var (
 func initializeApp() (datastore.RedisStore, error) {
 	flag.StringVar(&binding, "httpbind", ":8000", "address/port to bind listen socket")
 	flag.Parse()
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	logger.InfoLogger.Log("load err", err.Error())
-	// }
+	//err := godotenv.Load()
+	//if err != nil {
+	//	logger.InfoLogger.Log("load err", err.Error())
+	//}
 	helpers.ReadPgxConnEnvs()
 	paymentURI = os.Getenv("PAYMENT_URI")
 	productionURI = os.Getenv("PRODUCTION_URI")

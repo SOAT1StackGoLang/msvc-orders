@@ -33,6 +33,7 @@ func NewPaymentsRouter(svc service.PaymentsService, r *mux.Router, logger kitlog
 //
 //	@Summary		Get a payment by ID
 //	@Tags			Payments
+//	@Security		ApiKeyAuth
 //	@Description	Get a payment by ID
 //	@ID				get-payment
 //	@Produce		json

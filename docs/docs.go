@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/category": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Insert a category",
                 "consumes": [
                     "application/json"
@@ -80,6 +85,11 @@ const docTemplate = `{
         },
         "/category/all": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "List all categories",
                 "produces": [
                     "application/json"
@@ -137,6 +147,11 @@ const docTemplate = `{
         },
         "/category/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get a category by ID",
                 "produces": [
                     "application/json"
@@ -183,6 +198,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete a category",
                 "consumes": [
                     "application/json"
@@ -231,6 +251,11 @@ const docTemplate = `{
         },
         "/order": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -277,6 +302,11 @@ const docTemplate = `{
         },
         "/order/all": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -329,6 +359,11 @@ const docTemplate = `{
         },
         "/order/checkout/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -378,6 +413,11 @@ const docTemplate = `{
         },
         "/order/items": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -418,6 +458,11 @@ const docTemplate = `{
         },
         "/order/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -465,6 +510,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -514,6 +564,11 @@ const docTemplate = `{
         },
         "/payment/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get a payment by ID",
                 "produces": [
                     "application/json"
@@ -562,6 +617,11 @@ const docTemplate = `{
         },
         "/product": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update a product",
                 "consumes": [
                     "application/json"
@@ -614,6 +674,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Insert a product",
                 "consumes": [
                     "application/json"
@@ -668,6 +733,11 @@ const docTemplate = `{
         },
         "/product/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get a product by ID",
                 "produces": [
                     "application/json"
@@ -714,6 +784,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Delete a product",
                 "consumes": [
                     "application/json"
@@ -765,8 +840,10 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     },
     "externalDocs": {
