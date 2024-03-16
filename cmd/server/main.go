@@ -9,9 +9,7 @@ import (
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/transport/routes"
-	paymentsapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
-	productionapi "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -41,15 +39,12 @@ func main() {
 	productsSvc := service.NewProductsService(productsRepo, logger.InfoLogger)
 	r = routes.NewProductsRouter(productsSvc, r, logger.InfoLogger)
 
-	productionClient := productionapi.NewClient(productionURI, logger.InfoLogger)
-	paymentsClient := paymentsapi.NewClient(paymentURI, logger.InfoLogger)
-
 	paymentsRepo := persistence.NewPaymentsPersistence(gormDB, logger.InfoLogger)
-	paymentsSvc := service.NewPaymentsService(paymentsRepo, paymentsClient, logger.InfoLogger, cache)
+	paymentsSvc := service.NewPaymentsService(paymentsRepo, logger.InfoLogger, cache)
 	r = routes.NewPaymentsRouter(paymentsSvc, r, logger.InfoLogger)
 
 	ordersRepo := persistence.NewOrdersPersistence(gormDB, logger.InfoLogger)
-	ordersSvc := service.NewOrdersService(ordersRepo, productsSvc, paymentsSvc, logger.InfoLogger, cache, paymentsClient, productionClient)
+	ordersSvc := service.NewOrdersService(ordersRepo, productsSvc, paymentsSvc, logger.InfoLogger, cache)
 	r = routes.NewOrdersRouter(ordersSvc, r, logger.InfoLogger)
 
 	transport.NewHTTPServer(":8080", muxToHttp(r))

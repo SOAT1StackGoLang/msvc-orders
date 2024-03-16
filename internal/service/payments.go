@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
-	paymentapi "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/messages"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
@@ -16,10 +15,9 @@ import (
 )
 
 type paymentsSvc struct {
-	repo   persistence.PaymentRepository
-	client paymentapi.PaymentAPI
-	log    kitlog.Logger
-	redis  datastore.RedisStore
+	repo  persistence.PaymentRepository
+	log   kitlog.Logger
+	redis datastore.RedisStore
 }
 
 func (p *paymentsSvc) GetPayment(ctx context.Context, paymentID uuid.UUID) (*models.Payment, error) {
@@ -74,11 +72,14 @@ func (p *paymentsSvc) UpdatePayment(ctx context.Context, paymentID uuid.UUID, st
 	return updated, err
 }
 
-func NewPaymentsService(repo persistence.PaymentRepository, api paymentapi.PaymentAPI, log kitlog.Logger, cache datastore.RedisStore) PaymentsService {
+func NewPaymentsService(
+	repo persistence.PaymentRepository,
+	log kitlog.Logger,
+	cache datastore.RedisStore,
+) PaymentsService {
 	return &paymentsSvc{
-		client: api,
-		repo:   repo,
-		log:    log,
-		redis:  cache,
+		repo:  repo,
+		log:   log,
+		redis: cache,
 	}
 }

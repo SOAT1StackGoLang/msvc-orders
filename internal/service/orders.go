@@ -6,12 +6,9 @@ import (
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/persistence"
 	"github.com/SOAT1StackGoLang/msvc-orders/pkg/helpers"
-	payments "github.com/SOAT1StackGoLang/msvc-payments/pkg/api"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/datastore"
 	"github.com/SOAT1StackGoLang/msvc-payments/pkg/messages"
 	logger "github.com/SOAT1StackGoLang/msvc-payments/pkg/middleware"
-	productionpkg "github.com/SOAT1StackGoLang/msvc-production/pkg"
-	production "github.com/SOAT1StackGoLang/msvc-production/pkg/api"
 	productionmsgs "github.com/SOAT1StackGoLang/msvc-production/pkg/messages"
 	kitlog "github.com/go-kit/log"
 	"github.com/google/uuid"
@@ -20,13 +17,11 @@ import (
 )
 
 type ordersSvc struct {
-	paymentsAPI   payments.PaymentAPI
-	productionAPI production.ProductionAPI
-	cache         datastore.RedisStore
-	ordersRepo    persistence.OrdersRepository
-	productsSvc   ProductsService
-	paymentsSvc   PaymentsService
-	log           kitlog.Logger
+	cache       datastore.RedisStore
+	ordersRepo  persistence.OrdersRepository
+	productsSvc ProductsService
+	paymentsSvc PaymentsService
+	log         kitlog.Logger
 }
 
 func NewOrdersService(
@@ -35,17 +30,13 @@ func NewOrdersService(
 	paySvc PaymentsService,
 	log kitlog.Logger,
 	cache datastore.RedisStore,
-	paymentAPI payments.PaymentAPI,
-	productionAPI production.ProductionAPI,
 ) OrdersService {
 	svc := &ordersSvc{
-		cache:         cache,
-		ordersRepo:    repo,
-		productsSvc:   prodSvc,
-		paymentsSvc:   paySvc,
-		log:           log,
-		paymentsAPI:   paymentAPI,
-		productionAPI: productionAPI,
+		cache:       cache,
+		ordersRepo:  repo,
+		productsSvc: prodSvc,
+		paymentsSvc: paySvc,
+		log:         log,
 	}
 
 	go svc.SubscribeToPaymentUpdates()
@@ -56,7 +47,7 @@ func NewOrdersService(
 
 func (o *ordersSvc) SubscribeToProductionUpdates() {
 	ctx := context.Background()
-	sub, err := o.cache.Subscribe(ctx, productionpkg.OrderStatusChannel)
+	sub, err := o.cache.Subscribe(ctx, productionmsgs.ProductionStatusChannel)
 	if err != nil {
 		logger.Info("error subscribing to order status updates")
 		return
@@ -266,27 +257,43 @@ func (o *ordersSvc) handlePaymentStatusChangedMessage(msg string) {
 
 	switch status {
 	case models.PAYMENT_STATUS_APPROVED:
-		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_RECEIVED); err != nil {
+		orderID, err := uuid.Parse(in.OrderID)
+		if err != nil {
+			o.log.Log(
+				"error parsing order id",
+				zap.Error(err),
+			)
+			return
+		}
+		_, err = o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(in.ID), models.PAYMENT_STATUS_APPROVED)
+		if err != nil {
+			return
+		}
+
+		if out, err = o.UpdateOrderStatus(context.Background(), orderID, models.ORDER_STATUS_RECEIVED); err != nil {
 			return
 		}
 		err = o.publishMessage(context.Background(), productionmsgs.OrderSentMessage{
 			OrderID: out.ID.String(),
-			Status:  string(out.Status),
-		}, productionpkg.OrderStatusChannel)
-
-		o.cache.LPush(context.Background(), productionpkg.OrderStatusChannel, []byte("test")
+			Status:  productionmsgs.OrderStatus(string(out.Status)),
+		}, productionmsgs.ProductionChannel)
 
 		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_PREPARING); err != nil {
 			return
 		}
+
 	case models.PAYMENT_SATUS_REFUSED:
+		_, err = o.paymentsSvc.UpdatePayment(context.Background(), uuid.MustParse(in.ID), models.PAYMENT_SATUS_REFUSED)
+		if err != nil {
+			return
+		}
 		if out, err = o.UpdateOrderStatus(context.Background(), uuid.MustParse(in.OrderID), models.ORDER_STATUS_CANCELED); err != nil {
 			return
 		}
 		err = o.publishMessage(context.Background(), productionmsgs.OrderSentMessage{
 			OrderID: out.ID.String(),
-			Status:  string(out.Status),
-		}, productionpkg.OrderStatusChannel)
+			Status:  productionmsgs.OrderStatus(string(out.Status)),
+		}, productionmsgs.ProductionChannel)
 	}
 }
 
