@@ -35,6 +35,7 @@ const (
 	ORDER_STATUS_DONE                        = "Pronto"
 	ORDER_STATUS_FINISHED                    = "Finalizado"
 	ORDER_STATUS_CANCELED                    = "Cancelado"
+	ORDER_STATUS_FAILED_PAYMENT              = "Falha no Pagamento"
 )
 
 type OrderList struct {
