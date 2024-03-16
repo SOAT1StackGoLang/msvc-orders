@@ -48,6 +48,7 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 //
 //	@Summary		Get a product by ID
 //	@Tags			Products
+//	@Security		ApiKeyAuth
 //	@Description	Get a product by ID
 //	@ID				get-product
 //	@Produce		json
@@ -72,6 +73,7 @@ func decodeGetProductsRequest(_ context.Context, r *http.Request) (request any, 
 //
 //	@Summary		Insert a product
 //	@Tags			Products
+//	@Security		ApiKeyAuth
 //	@Description	Insert a product
 //	@ID				insert-product
 //	@Accept			json
@@ -100,6 +102,7 @@ func decodeInsertProductsRequest(_ context.Context, r *http.Request) (request an
 //
 //	@Summary		Update a product
 //	@Tags			Products
+//	@Security		ApiKeyAuth
 //	@Description	Update a product
 //	@ID				update-product
 //	@Accept			json
@@ -129,6 +132,7 @@ func decodeUpdateProductsRequest(_ context.Context, r *http.Request) (request an
 //
 //	@Summary		Delete a product
 //	@Tags			Products
+//	@Security		ApiKeyAuth
 //	@Description	Delete a product
 //	@ID				delete-product
 //	@Accept			json
