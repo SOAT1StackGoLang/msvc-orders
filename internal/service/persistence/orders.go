@@ -193,8 +193,7 @@ func (o *ordersPersistence) ListOrders(ctx context.Context, limit, offset int) (
 		Limit(limit).
 		Offset(offset).
 		Order("status DESC").
-		Where("status > ? AND status < ? ", ORDER_STATUS_WAITING_PAYMENT, ORDER_STATUS_FINISHED).
-		Scan(&saveOrders).Error; err != nil {
+		Find(&saveOrders).Error; err != nil {
 		o.log.Log(
 			"failed listing orders",
 			zap.Error(err),
