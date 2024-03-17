@@ -170,6 +170,27 @@ func (o *ordersSvc) UpdateOrderItems(ctx context.Context, orderID uuid.UUID, pro
 }
 
 func (o *ordersSvc) DeleteOrder(ctx context.Context, orderID uuid.UUID) error {
+	err := o.publishMessage(context.Background(), productionmsgs.OrderSentMessage{
+		OrderID: orderID.String(),
+		Status:  models.ORDER_STATUS_CANCELED,
+	}, productionmsgs.ProductionChannel)
+	if err != nil {
+		o.log.Log(
+			"error publishing message",
+			err,
+		)
+	}
+
+	order, err := o.GetOrder(ctx, orderID)
+	if err != nil {
+		return err
+	}
+
+	_, err = o.paymentsSvc.UpdatePayment(ctx, order.PaymentID, models.PAYMENT_SATUS_REFUSED)
+	if err != nil {
+		return err
+	}
+
 	return o.ordersRepo.DeleteOrder(ctx, orderID)
 }
 
