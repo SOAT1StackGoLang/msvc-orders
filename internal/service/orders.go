@@ -244,15 +244,11 @@ func (o *ordersSvc) handlePaymentStatusChangedMessage(msg string) {
 	if err != nil {
 		o.log.Log(
 			"error unmarshalling order status update",
-			zap.Error(err),
+			err,
 		)
 		return
 	}
 
-	o.log.Log("Received payment status update",
-		zap.String("payment_id", in.ID),
-		zap.String("status", in.Status),
-	)
 	status := models.PaymentStatusFromClearingService(in.Status)
 
 	switch status {
@@ -261,7 +257,7 @@ func (o *ordersSvc) handlePaymentStatusChangedMessage(msg string) {
 		if err != nil {
 			o.log.Log(
 				"error parsing order id",
-				zap.Error(err),
+				err,
 			)
 			return
 		}
@@ -302,7 +298,7 @@ func (o *ordersSvc) publishMessage(ctx context.Context, msg any, channel string)
 	if err != nil {
 		o.log.Log(
 			"error marshalling message",
-			zap.Error(err),
+			err,
 		)
 		return err
 
@@ -311,9 +307,7 @@ func (o *ordersSvc) publishMessage(ctx context.Context, msg any, channel string)
 	if err != nil {
 		o.log.Log(
 			"error publishing message",
-			zap.Any("message", msg),
-			zap.String("channel", channel),
-			zap.Error(err),
+			err,
 		)
 	}
 

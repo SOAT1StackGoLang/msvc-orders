@@ -70,7 +70,7 @@ func productFromModel(in []models.Product) json.RawMessage {
 			Name:        p.Name,
 			Description: p.Description,
 			CategoryID:  p.CategoryID,
-			Price:       decimal.Decimal{},
+			Price:       p.Price,
 		}
 		products = append(products, oP)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/endpoint"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
@@ -41,7 +42,69 @@ func NewProductsRouter(svc service.ProductsService, r *mux.Router, logger kitlog
 		options...,
 	))
 
+	r.Methods(
+		http.MethodGet).
+		Path("/product/category/{id}").
+		Queries("limit", "{limit:[0-9]+}", "offset", "{offset:[0-9]+}").
+		Handler(
+			httptransport.NewServer(
+				prodEndpoints.ListProductsByCategory,
+				decodeListProductsRequest,
+				encodeResponse,
+				options...,
+			),
+		)
+
 	return r
+}
+
+// ListProducts
+//
+//	@Summary		List products
+//	@Tags			Products
+//	@Security		ApiKeyAuth
+//	@Description	List products
+//	@ID				list-products
+//	@Produce		json
+//	@Param			id		path		string	false	"Category ID"
+//	@Param			limit	query		int		true	"Limit"		default(10)
+//	@Param			offset	query		int		true	"Offset"	default(0)
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"error"
+//	@Failure		404		{string}	string	"Not Found"
+//	@Failure		500		{string}	string	"Inernal Server Error"
+//	@Router			/product/category/{id} [get]
+func decodeListProductsRequest(_ context.Context, r *http.Request) (request any, err error) {
+	vars := mux.Vars(r)
+
+	id, ok := vars["id"]
+	if !ok {
+		return nil, ErrBadRouting
+	}
+
+	query := r.URL.Query()
+	limit := query.Get("limit")
+
+	limitInt, err := strconv.ParseInt(limit, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	if limitInt == 0 {
+		return nil, ErrBadRequest
+	}
+
+	offset := query.Get("offset")
+
+	offsetInt, err := strconv.ParseInt(offset, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint.ListProductsByCategoryRequest{
+		ID:     id,
+		Limit:  limitInt,
+		Offset: offsetInt,
+	}, nil
 }
 
 // GetProduct
