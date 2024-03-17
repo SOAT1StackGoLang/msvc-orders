@@ -1,0 +1,601 @@
+basePath: /
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API for managing orders
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Tech Challenge Order API
+  version: "1.0"
+paths:
+  /category:
+    post:
+      consumes:
+      - application/json
+      description: Insert a category
+      operationId: insert-category
+      parameters:
+      - description: Category data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Bebidas Importadas\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Insert a category
+      tags:
+      - Categories
+  /category/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category
+      operationId: delete-category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a category
+      tags:
+      - Categories
+    get:
+      description: Get a category by ID
+      operationId: get-category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get a category by ID
+      tags:
+      - Categories
+  /category/all:
+    get:
+      description: List all categories
+      operationId: list-categories
+      parameters:
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List all categories
+      tags:
+      - Categories
+  /order:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - default: 123e4567-e89b-12d3-a456-426614174000
+        description: User ID
+        in: header
+        name: user_id
+        type: string
+      - description: Order request data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n \"products_ids\": [\"b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12\",
+            \"b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12\"]\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create an order
+      tags:
+      - Orders
+  /order/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an order
+      tags:
+      - Orders
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get an order
+      tags:
+      - Orders
+  /order/all:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List all orders
+      tags:
+      - Orders
+  /order/checkout/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Checkout an order
+      tags:
+      - Orders
+  /order/items:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update order items
+      tags:
+      - Orders
+  /payment/{id}:
+    get:
+      description: Get a payment by ID
+      operationId: get-payment
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get a payment by ID
+      tags:
+      - Payments
+  /product:
+    post:
+      consumes:
+      - application/json
+      description: Insert a product
+      operationId: insert-product
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"name\": \"Coca-Cola 2L\",\r\n  \"description\": \"Refrigerante
+            Coca-Cola 2L\",\r\n  \"category_id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n
+            \ \"price\": \"10.00\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Insert a product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update a product
+      operationId: update-product
+      parameters:
+      - description: Product data
+        in: body
+        name: request
+        required: true
+        schema:
+          example: "{\r\n  \"id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n  \"name\":
+            \"Coca-Cola 2L\",\r\n  \"description\": \"Refrigerante Coca-Cola 2L\",\r\n
+            \ \"category_id\": \"a557b0c0-3bcf-11ee-be56-0242ac120002\",\r\n  \"price\":
+            \"10.00\"\r\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update a product
+      tags:
+      - Products
+  /product/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product
+      operationId: delete-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a product
+      tags:
+      - Products
+    get:
+      description: Get a product by ID
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get a product by ID
+      tags:
+      - Products
+  /product/category/{id}:
+    get:
+      description: List products
+      operationId: list-products
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        type: string
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Inernal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: List products
+      tags:
+      - Products
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

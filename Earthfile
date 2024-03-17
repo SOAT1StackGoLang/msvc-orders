@@ -18,20 +18,20 @@ deps:
     FROM golang:alpine
     WORKDIR /build
     COPY +file/* ./
-    RUN ls -althR
+    #RUN ls -althR
     RUN apk add --no-cache git
     RUN go mod tidy
     RUN go mod download
-    #RUN go get -u github.com/swaggo/swag/cmd/swag
-    #RUN go install github.com/swaggo/swag/cmd/swag
-    #RUN swag init -g ../../cmd/web/routes.go -o ./docs -d ./internal/handlers
+    RUN go get -u github.com/swaggo/swag/cmd/swag
+    RUN go install github.com/swaggo/swag/cmd/swag
+    RUN swag init -g helpers.go -o ../../../docs/ -d ./internal/transport/routes
 
 compile:
     FROM +deps
     ARG GOOS=linux
     ARG GOARCH=amd64
     ARG VARIANT
-    RUN ls -alth && pwd
+    #RUN ls -alth && pwd
     RUN GOARM=${VARIANT#v} CGO_ENABLED=0 go build \
         -installsuffix 'static' \
         -o compile/app cmd/server/*.go

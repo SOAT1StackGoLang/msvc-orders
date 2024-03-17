@@ -59,8 +59,8 @@ type (
 
 	ListProductsByCategoryRequest struct {
 		ID     string `json:"id"`
-		Limit  int    `json:"limit"`
-		Offset int    `json:"offset"`
+		Limit  int64  `json:"limit"`
+		Offset int64  `json:"offset"`
 	}
 
 	DeleteProductRequest struct {
@@ -148,7 +148,8 @@ type (
 		PaymentID string `json:"payment_id"`
 	}
 
-	// ORDERS
+	// OrderResponse holds the order response data
+	//	@Description	Order response data
 	OrderResponse struct {
 		ID        string            `json:"id" description:"ID do Pedido"`
 		PaymentID string            `json:"payment_id,omitempty" description:"ID do pagamento"`
@@ -160,11 +161,15 @@ type (
 		Products  []ProductResponse `json:"products" description:"Lista de Pedidos"`
 	}
 
+	// CreateOrderRequest holds the order request data
+	//	@Description	Order request data
 	CreateOrderRequest struct {
 		UserID      string   `json:"user_id" description:"ID do dono do pedido"`
 		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`
 	}
 
+	// UpdateOrderRequest holds the order request data for update
+	//	@Description	Order request data for update
 	UpdateOrderRequest struct {
 		ID          string   `json:"id"`
 		ProductsIDs []string `json:"products_ids" description:"ID dos produtos"`

@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service"
 	"github.com/SOAT1StackGoLang/msvc-orders/internal/service/models"
 	"github.com/go-kit/kit/endpoint"
@@ -141,10 +142,8 @@ func makeUpdateOrderItemsEndpoint(svc service.OrdersService) endpoint.Endpoint {
 
 func makeCreateOrderEndpoint(svc service.OrdersService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		var order *models.Order
 		req := request.(CreateOrderRequest)
-
-		uid, _ := uuid.Parse(req.UserID)
-
 		ids := req.ProductsIDs
 		var prods []models.Product
 
@@ -156,9 +155,17 @@ func makeCreateOrderEndpoint(svc service.OrdersService) endpoint.Endpoint {
 			prods = append(prods, models.Product{ID: prodID})
 		}
 
-		order, err := svc.CreateOrder(ctx, prods, uid)
-		if err != nil {
-			return nil, err
+		uid, err := uuid.Parse(req.UserID)
+		if err == nil {
+			order, err = svc.CreateOrder(ctx, prods, uid)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			order, err = svc.CreateOrder(ctx, prods, uuid.Nil)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		return OrderResponseFromModel(order), nil

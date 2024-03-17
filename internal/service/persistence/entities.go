@@ -70,7 +70,7 @@ func productFromModel(in []models.Product) json.RawMessage {
 			Name:        p.Name,
 			Description: p.Description,
 			CategoryID:  p.CategoryID,
-			Price:       decimal.Decimal{},
+			Price:       p.Price,
 		}
 		products = append(products, oP)
 	}
@@ -161,6 +161,7 @@ const (
 	ORDER_STATUS_DONE
 	ORDER_STATUS_FINISHED
 	ORDER_STATUS_CANCELED
+	ORDER_STATUS_FAILED_PAYMENT
 )
 
 func orderStatusToModelStatus(in OrderStatus) models.OrderStatus {
@@ -179,6 +180,8 @@ func orderStatusToModelStatus(in OrderStatus) models.OrderStatus {
 		return models.ORDER_STATUS_FINISHED
 	case ORDER_STATUS_CANCELED:
 		return models.ORDER_STATUS_CANCELED
+	case ORDER_STATUS_FAILED_PAYMENT:
+		return models.ORDER_STATUS_FAILED_PAYMENT
 	default:
 		return models.ORDER_STATUS_UNSET
 	}
@@ -200,6 +203,8 @@ func orderStatusFromModel(in models.OrderStatus) OrderStatus {
 		return ORDER_STATUS_FINISHED
 	case models.ORDER_STATUS_CANCELED:
 		return ORDER_STATUS_CANCELED
+	case models.ORDER_STATUS_FAILED_PAYMENT:
+		return ORDER_STATUS_FAILED_PAYMENT
 	default:
 		return ORDER_STATUS_UNSET
 	}

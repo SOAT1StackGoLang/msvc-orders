@@ -74,7 +74,12 @@ func (o *ordersPersistence) CreateOrder(ctx context.Context, order *models.Order
 	in := orderFromModels(order)
 	in.Status = ORDER_STATUS_OPEN
 
-	if err := o.db.WithContext(ctx).Table(ordersTable).Omit("updated_at").Create(&in).Error; err != nil {
+	columns := []string{"updated_at"}
+	if in.UserID == uuid.Nil {
+		columns = append(columns, "user_id")
+	}
+
+	if err := o.db.WithContext(ctx).Table(ordersTable).Omit(columns...).Create(&in).Error; err != nil {
 		o.log.Log(
 			"db failed at CreateOrder",
 			zap.Any("order_input", order),
@@ -188,8 +193,7 @@ func (o *ordersPersistence) ListOrders(ctx context.Context, limit, offset int) (
 		Limit(limit).
 		Offset(offset).
 		Order("status DESC").
-		Where("status > ? AND status < ? ", ORDER_STATUS_WAITING_PAYMENT, ORDER_STATUS_FINISHED).
-		Scan(&saveOrders).Error; err != nil {
+		Find(&saveOrders).Error; err != nil {
 		o.log.Log(
 			"failed listing orders",
 			zap.Error(err),

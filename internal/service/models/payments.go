@@ -24,11 +24,11 @@ const (
 	PAYMENT_SATUS_REFUSED                 = "Recusado"
 )
 
-func PaymentStatusFromClearingService(status api.PaymentStatus) PaymentStatus {
+func PaymentStatusFromClearingService(status string) PaymentStatus {
 	switch status {
-	case api.PaymentStatusPaid:
+	case string(api.PaymentStatusPaid):
 		return PAYMENT_STATUS_APPROVED
-	case api.PaymentStatusPending:
+	case string(api.PaymentStatusPending):
 		return PAYMENT_STATUS_OPEN
 	default:
 		return PAYMENT_SATUS_REFUSED
