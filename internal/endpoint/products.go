@@ -37,15 +37,15 @@ func makeListProductsByCategory(svc service.ProductsService) endpoint.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		cats, err := svc.ListProductsByCategory(ctx, uid, req.Limit, req.Offset)
+		cats, err := svc.ListProductsByCategory(ctx, uid, int(req.Limit), int(req.Offset))
 		if err != nil {
 			return nil, err
 		}
 
 		out := ProductList{
-			Products: make([]ProductResponse, 0, len(cats.Products)),
-			Limit:    req.Limit,
-			Offset:   req.Offset,
+			Products: make([]ProductResponse, len(cats.Products)),
+			Limit:    int(req.Limit),
+			Offset:   int(req.Offset),
 			Total:    len(cats.Products),
 		}
 		for k, v := range cats.Products {

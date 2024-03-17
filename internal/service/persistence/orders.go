@@ -74,7 +74,12 @@ func (o *ordersPersistence) CreateOrder(ctx context.Context, order *models.Order
 	in := orderFromModels(order)
 	in.Status = ORDER_STATUS_OPEN
 
-	if err := o.db.WithContext(ctx).Table(ordersTable).Omit("updated_at").Create(&in).Error; err != nil {
+	columns := []string{"updated_at"}
+	if in.UserID == uuid.Nil {
+		columns = append(columns, "user_id")
+	}
+
+	if err := o.db.WithContext(ctx).Table(ordersTable).Omit(columns...).Create(&in).Error; err != nil {
 		o.log.Log(
 			"db failed at CreateOrder",
 			zap.Any("order_input", order),

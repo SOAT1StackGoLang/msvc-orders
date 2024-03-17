@@ -79,7 +79,7 @@ func NewOrdersRouter(svc service.OrdersService, r *mux.Router, logger kitlog.Log
 //
 //	@Summary	Checkout an order
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		string	true	"Order ID"
@@ -103,7 +103,7 @@ func decodeOrderCheckout(_ context.Context, r *http.Request) (request any, err e
 //
 //	@Summary	Delete an order
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		string	true	"Order ID"
@@ -127,7 +127,7 @@ func decodeDeleteOrder(_ context.Context, r *http.Request) (request any, err err
 //
 //	@Summary	Update order items
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{string}	string	"ok"
@@ -151,22 +151,27 @@ func decodeAlterOrderItems(_ context.Context, r *http.Request) (request any, err
 //
 //	@Summary	Create an order
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
-//	@Param		request	body		string	true	"Order request data"	SchemaExample({\r\n "user_id": "123e4567-e89b-12d3-a456-426614174000",\r\n "products_ids": ["b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"]\r\n})
+//	@Param		user_id	header		string	false	"User ID"				default(123e4567-e89b-12d3-a456-426614174000)
+//	@Param		request	body		string	true	"Order request data"	SchemaExample({\r\n "products_ids": ["b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"]\r\n})
 //	@Success	200		{string}	string	"ok"
 //	@Failure	400		{string}	string	"error"
 //	@Failure	500		{string}	string	"error"
 //	@Router		/order [post]
 func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, err error) {
-	var req endpoint.CreateOrderRequest
+	var (
+		req endpoint.CreateOrderRequest
+	)
+
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
 		return nil, ErrBadRequest
 	}
+	uID := r.Header.Get("user_id")
 
 	return endpoint.CreateOrderRequest{
-		UserID:      req.UserID,
+		UserID:      uID,
 		ProductsIDs: req.ProductsIDs,
 	}, nil
 }
@@ -175,7 +180,7 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 //
 //	@Summary	Get an order
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		string	true	"Order ID"
@@ -199,7 +204,7 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (request any, err
 //
 //	@Summary	List all orders
 //	@Tags		Orders
-//	@Security		ApiKeyAuth
+//	@Security	ApiKeyAuth
 //	@Accept		json
 //	@Produce	json
 //	@Param		limit	query		int		true	"Limit"		default(10)
