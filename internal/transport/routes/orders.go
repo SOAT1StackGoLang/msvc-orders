@@ -168,6 +168,9 @@ func decodeCreateOrderRequest(_ context.Context, r *http.Request) (request any, 
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
 		return nil, ErrBadRequest
 	}
+	if req.UserID != "" {
+		return nil, ErrBadRequest
+	}
 	uID := r.Header.Get("user_id")
 
 	return endpoint.CreateOrderRequest{
